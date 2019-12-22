@@ -12,12 +12,43 @@ class Post_Info_Aggregator {
 
 	public $targets;
 
+	public function __toString() :string {
+		//toString function--for quick & dirty debugging
+	
+		$o = "";
+
+		$o .= "feature data: <br>";
+		$o .= print_r($this->features, true);
+		$o .= "<br><br>";
+
+		$o .= "output data: <br>";
+		$o .= print_r($this->outputs, true);
+		$o .= "<br><br>";
+
+		$o .= "Targets: <br>";
+		$o .= print_r($this->targets, true);
+		$o .= "<br><br>";
+
+		return $o;
+
+	}
+
+
+	private function lower_case_array(&$array) : void {
+		
+		for ($i=0; $i < count($array); $i++) { 
+			$array[$i] = strtolower($array[$i]);
+		}
+
+	}
+
 
 	function extract_post_features(bool $testing, array $taxonomies): void {
 		
 		$this->features = array();
 
 		$this->outputs = array();
+
 
 		$args = array(
 		  'numberposts' => -1
@@ -27,7 +58,7 @@ class Post_Info_Aggregator {
 
 		foreach ($all_posts as $post) {
 			//push features to array in order of post
-			array_push($this->features, array($post->post_title, $post->post_type, $post->post_date));
+			array_push($this->features, array(strtolower($post->post_title)));//, $post->post_type, $post->post_date));
 
 			if ($testing) {
 
@@ -38,6 +69,8 @@ class Post_Info_Aggregator {
 
 					if ($matching_terms) {
 						$term_names = array_column($matching_terms, 'name');
+
+						$this->lower_case_array($term_names);
 					}
 					else {
 						$term_names = "";
@@ -49,22 +82,6 @@ class Post_Info_Aggregator {
 				}
 			}
 		}
-
-		echo "feature data: <br>";
-
-		var_dump($this->features);
-
-		echo "<br><br>";
-
-
-		echo "output data: <br>";
-
-		var_dump($this->outputs);
-
-		echo "<br><br>";
-
-
-		wp_die();
 
 	}
 
@@ -83,12 +100,10 @@ class Post_Info_Aggregator {
 
 			$term_names = array_column($terms, 'name');
 
+			$this->lower_case_array($term_names);
+
 			array_push($this->targets, $term_names);
 		}
-
-		echo "Targets: <br>";
-		var_dump($this->targets);
-		echo "<br><br>";
 
 	}
 
