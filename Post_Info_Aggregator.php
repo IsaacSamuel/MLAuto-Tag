@@ -58,7 +58,7 @@ class Post_Info_Aggregator {
 
 		foreach ($all_posts as $post) {
 			//push features to array in order of post
-			array_push($this->features, array(strtolower($post->post_title)));//, $post->post_type, $post->post_date));
+			array_push($this->features, strtolower($post->post_title));//, $post->post_type, $post->post_date));
 
 			if ($testing) {
 
@@ -68,9 +68,12 @@ class Post_Info_Aggregator {
 					$matching_terms = get_the_terms($post->ID, $taxonomy);
 
 					if ($matching_terms) {
-						$term_names = array_column($matching_terms, 'name');
+						$term_names = "";
 
-						$this->lower_case_array($term_names);
+						foreach ($matching_terms as $term) {
+							$term_names .= ' ' . str_replace(" ", "_", strtolower($term->name));
+						}
+
 					}
 					else {
 						$term_names = "";
@@ -93,16 +96,25 @@ class Post_Info_Aggregator {
 		    'hide_empty' => true,
 		);
 
+
+
 		foreach ($taxonomies as $taxonomy) {
+			$taxonomy_terms = array();
+
 			$args['taxonomy'] = $taxonomy;
 
 			$terms = get_terms( $args );
 
-			$term_names = array_column($terms, 'name');
+			foreach ($terms as $term) {
+				$term_names = ' ' . str_replace(" ", "_", strtolower($term->name));
 
-			$this->lower_case_array($term_names);
+				array_push($taxonomy_terms, $term_names);
 
-			array_push($this->targets, $term_names);
+			}
+
+			array_push($this->targets, $taxonomy_terms);
+
+
 		}
 
 	}
