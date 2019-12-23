@@ -12,25 +12,20 @@ declare(strict_types=1);
 
 require 'class_loader.php';
 
+use mlauto\Model\Post_Info_Aggregator;
+
+use mlauto\Controller\Vectorizer;
+use mlauto\Controller\Classifier;
+
+
 
 use Phpml\Metric\Accuracy;
-use mlauto\Post_Info_Aggregator;
 use Phpml\Classification\NaiveBayes;
-use Phpml\Classification\SVC;
 
-
-use Phpml\FeatureExtraction\TokenCountVectorizer;
-use Phpml\Tokenization\NGramTokenizer;
-use Phpml\FeatureExtraction\StopWords\English;
-use Phpml\Tokenization\WhitespaceTokenizer;
-
-use Phpml\FeatureExtraction\TfIdfTransformer;
-use Phpml\Dataset\ArrayDataset;
 use Phpml\CrossValidation\StratifiedRandomSplit;
 
 use Phpml\Metric\ClassificationReport;
 
-use Phpml\SupportVectorMachine\Kernel;
 
 
 
@@ -53,43 +48,16 @@ class MLAuto_Tag {
 		return $o;
 	}
 
-	function extract_test_values($info) {
+	//name of taxonomy
+	//name of tag
+	//location of classifier
+	//date
+	//version
+	//specified features
+	//runtime
 
-		return $targets = $info->targets[0];
-	}
-
-	function contains_term($term_list, $term) {
-		$contains = 0;
-
-		if (strpos($term_list, $term) !== false) {
-			$contains = 1;
-		}
-
-		return $contains;
-	}
-
-	function vectorize_targets($info, $targets) {
-
-		$vectorized_outputs = array();
-
-		foreach ($targets as $target) {
-			
-			$outputs = array_column($info->outputs, 0);
-			$target_outputs = array();
-			
-			foreach ($outputs as $key) {
-				array_push($target_outputs, $this->contains_term($key, $target));
-			}
-
-			array_push($vectorized_outputs, $target_outputs);
-
-		}
-
-		return $vectorized_outputs;
-	}
-
-	public function vectorize($info) :void {
-		$all_targets = $this->extract_test_values($info);
+	public function vectorize_samples($info) :void {
+/*		$all_targets = $this->extract_test_values($info);
 
 		$vectorized_outputs = $this->vectorize_targets($info, $all_targets);
 
@@ -98,10 +66,6 @@ class MLAuto_Tag {
 		for ($i=0; $i < count($vectorized_outputs); $i++) { 
 
 			$this->dataset = new ArrayDataset($info->features, $vectorized_outputs[$i]);
-
-		
-
-
 
 
 
@@ -115,7 +79,7 @@ class MLAuto_Tag {
 
 
 
-			$classifier = new SVC();//SVC(Kernel::RBF, 1.0, 3, null, 0.0, .001, 100, false, false);
+			$classifier = new SVC(Kernel::RBF, 1.0, 3, null, 0.0, .001, 100, false, true);
 			$classifier->train($samples, $sample_labels);
 
 
@@ -151,7 +115,11 @@ class MLAuto_Tag {
 
 			}*/
 
-			echo Accuracy::score($test_labels, $predictedLabels, true) . "<br>";
+			//var_dump($predictedLabels);
+
+			//echo  Accuracy::score($test_labels, $predictedLabels, true) . "<br>";
+
+
 
 
 			//var_dump( $predicted);
@@ -159,69 +127,46 @@ class MLAuto_Tag {
 			//exit;
 
 
-		}
-
-/*
-		$this->dataset = new ArrayDataset($info->features, array_column($info->outputs, 0));
-
-
-		$samples = array_slice($this->dataset->getSamples(), 0, 60);
-		$sample_labels = array_slice($this->dataset->getTargets(), 0, 60);
-
-
-		$sample_vectorizer = new TokenCountVectorizer(new WhitespaceTokenizer());
-		$sample_vectorizer->fit($samples);
-		$sample_vectorizer->transform($samples);
-
-
-
-		$classifier = new SVC(Kernel::RBF, 1.0, 3, null, 0.0, .001, 100, true, true);
-		$classifier->train($samples, $sample_labels);
-
-
-		$test_samples = array_slice ($this->dataset->getSamples(), 60);
-		$test_labels = array_slice ($this->dataset->getTargets(), 60);
-
-		$sample_vectorizer->transform($test_samples);
-		
-
-		$predicted = $classifier->predictProbability($test_samples);
-
-
-		$highest_prediction = array();
-		$i = 0;
-
-		foreach ($predicted as $prediction) {
-
-			$highest_prediction = array();
-			$max = 0;
-
-			foreach ($prediction as $key => $value) {
-				if ($value > $max) {
-					$max = $value;
-					$highest_prediction[$i] = array($key, $value);
-				}
-			}
-			//var_dump($highest_prediction);
-
-			$i++;
-
-		}
-
-
-		var_dump( $predicted);
-
-	*/	
-		wp_die();
-
 	}
 
 	public function __construct() {
-		$taxonomies = array("category", "post_tag");
+		$taxonomies = array("category");//, "post_tag");
 
 		$info = new Post_Info_Aggregator($taxonomies);
 
-		$this->vectorize($info);
+		$vectorizer = new Vectorizer($info->features);
+
+
+		for ($i=0; $i < count($taxonomies); $i++) { 
+
+			foreach($info->targets_collection[$i] as $target) {
+
+				$labels = array_column($info->labels_collection, $i);
+
+				$vectorized_labels = $vectorizer->vectorize_labels($labels, $target);
+
+
+				$train_samples = array_slice($vectorizer->vectorized_samples, 0, 60);
+				$train_labels = array_slice($vectorized_labels, 0, 60);
+
+				$test_samples = array_slice($vectorizer->vectorized_samples, 60);
+				$test_labels = array_slice($vectorized_labels, 60);
+
+				$classifier = new Classifier($train_samples, $train_labels);
+
+
+				$predictedLabels = $classifier->predict($test_samples, $test_labels);
+
+				echo 'Target: ' . $target . " " . Accuracy::score($test_labels, $predictedLabels, true) . "<br>";
+
+
+			}
+
+			wp_die();
+
+		}
+
+
 	}
 
 }

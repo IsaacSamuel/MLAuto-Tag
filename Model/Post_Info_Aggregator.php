@@ -2,15 +2,16 @@
 
 declare(strict_types=1);
 
-namespace mlauto;
+namespace mlauto\Model;
 
 class Post_Info_Aggregator {
 
 	public $features;
 
-	public $outputs;
+	public $labels_collection;
 
-	public $targets;
+	public $targets_collection;
+	
 
 	public function __toString() :string {
 		//toString function--for quick & dirty debugging
@@ -22,11 +23,11 @@ class Post_Info_Aggregator {
 		$o .= "<br><br>";
 
 		$o .= "output data: <br>";
-		$o .= print_r($this->outputs, true);
+		$o .= print_r($this->labels_collection, true);
 		$o .= "<br><br>";
 
-		$o .= "Targets: <br>";
-		$o .= print_r($this->targets, true);
+		$o .= "targets_collection: <br>";
+		$o .= print_r($this->targets_collection, true);
 		$o .= "<br><br>";
 
 		return $o;
@@ -34,7 +35,7 @@ class Post_Info_Aggregator {
 	}
 
 
-	private function lower_case_array(&$array) : void {
+	private function lower_case_array(array &$array) : void {
 		
 		for ($i=0; $i < count($array); $i++) { 
 			$array[$i] = strtolower($array[$i]);
@@ -43,11 +44,11 @@ class Post_Info_Aggregator {
 	}
 
 
-	function extract_post_features(bool $testing, array $taxonomies): void {
+	function extract_post_features(array $taxonomies): void {
 		
 		$this->features = array();
 
-		$this->outputs = array();
+		$this->labels_collection = array();
 
 
 		$args = array(
@@ -60,37 +61,35 @@ class Post_Info_Aggregator {
 			//push features to array in order of post
 			array_push($this->features, strtolower($post->post_title));//, $post->post_type, $post->post_date));
 
-			if ($testing) {
 
-				array_push($this->outputs, array());
+			array_push($this->labels_collection, array());
 
-				foreach ($taxonomies as $taxonomy) {
-					$matching_terms = get_the_terms($post->ID, $taxonomy);
+			foreach ($taxonomies as $taxonomy) {
+				$matching_terms = get_the_terms($post->ID, $taxonomy);
 
-					if ($matching_terms) {
-						$term_names = "";
+				if ($matching_terms) {
+					$term_names = "";
 
-						foreach ($matching_terms as $term) {
-							$term_names .= ' ' . str_replace(" ", "_", strtolower($term->name));
-						}
-
+					foreach ($matching_terms as $term) {
+						$term_names .= ' ' . str_replace(" ", "_", strtolower($term->name));
 					}
-					else {
-						$term_names = "";
-					}
-
-
-					array_push($this->outputs[count($this->outputs) - 1], $term_names); 
 
 				}
+				else {
+					$term_names = "";
+				}
+
+
+				array_push($this->labels_collection[count($this->labels_collection) - 1], $term_names); 
+
 			}
 		}
 
 	}
 
-	function extract_targets(array $taxonomies): void {
+	function extract_targets_collection(array $taxonomies): void {
 
-		$this->targets = array();
+		$this->targets_collection = array();
 
 		$args = array(
 		    'hide_empty' => true,
@@ -112,18 +111,18 @@ class Post_Info_Aggregator {
 
 			}
 
-			array_push($this->targets, $taxonomy_terms);
+			array_push($this->targets_collection, $taxonomy_terms);
 
 
 		}
 
 	}
 
-	public function __construct($taxonomies) {
+	public function __construct(array $taxonomies) {
 
-		$this->extract_targets($taxonomies);
+		$this->extract_targets_collection($taxonomies);
 
-		$this->extract_post_features(true, $taxonomies);
+		$this->extract_post_features($taxonomies);
 
 	}
 
