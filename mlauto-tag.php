@@ -14,8 +14,8 @@ require 'class_loader.php';
 
 use mlauto\Model\PostInfoAggregator;
 
-use mlauto\Controller\VectorizerController;
-use mlauto\Controller\ClassifierController;
+use mlauto\Analysis\Vectorizer;
+use mlauto\Analysis\Classifier;
 
 
 
@@ -36,7 +36,7 @@ class MLAuto_Tag {
 
 		$info = new PostInfoAggregator($taxonomies);
 
-		$vectorizer = new VectorizerController($info->features);
+		$vectorizer = new Vectorizer($info->features);
 
 
 		for ($i=0; $i < count($taxonomies); $i++) { 
@@ -54,7 +54,7 @@ class MLAuto_Tag {
 				$test_samples = array_slice($vectorizer->vectorized_samples, 60);
 				$test_labels = array_slice($vectorized_labels, 60);
 
-				$classifier = new ClassifierController($train_samples, $train_labels);
+				$classifier = new Classifier($train_samples, $train_labels);
 
 
 				$predictedLabels = $classifier->predict($test_samples, $test_labels);

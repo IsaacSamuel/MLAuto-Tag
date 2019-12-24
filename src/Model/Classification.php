@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace mlauto\Model;
 
-	//Classifiers table
+	//Classification table
 	//name of taxonomy
 	//name of tag
 	//location of classifier
@@ -12,4 +12,4 @@ namespace mlauto\Model;
 	//version
 	//specified features
 	//runtime
-class
+class Cla

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace mlauto\Controller;
+namespace mlauto\Analysis;
 
 use Phpml\Dataset\ArrayDataset;
 use Phpml\FeatureExtraction\TokenCountVectorizer;
@@ -10,7 +10,7 @@ use Phpml\Tokenization\WhitespaceTokenizer;
 
 
 
-class VectorizerController {
+class Vectorizer {
 
 	public $vectorized_samples;
 
