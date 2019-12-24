@@ -8,7 +8,7 @@ use Phpml\Classification\SVC;
 use Phpml\SupportVectorMachine\Kernel;
 
 
-class Classifier {
+class ClassifierController {
 
 	private $trained_classifier;
 

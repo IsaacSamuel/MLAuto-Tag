@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace mlauto\Model;
 
-class Post_Info_Aggregator {
+class PostInfoAggregator {
 
 	public $features;
 
