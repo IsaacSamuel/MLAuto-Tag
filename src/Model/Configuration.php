@@ -10,3 +10,7 @@
 	//gamma
 	//tolerance
 	//cache size
+
+class Configuration {
+	
+}

@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace mlauto\Controller;
+namespace mlauto\Analysis;
 
 use Phpml\Classification\SVC;
 use Phpml\SupportVectorMachine\Kernel;
 
 
-class ClassifierController {
+class Classifier {
 
 	private $trained_classifier;
 
