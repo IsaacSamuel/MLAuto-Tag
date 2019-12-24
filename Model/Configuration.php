@@ -1,6 +1,6 @@
 <?php
 
-	//Options table
+	//Configurations table
 	//Which Taxonomies to use
 	//Which features to use
 	//Has been run yet

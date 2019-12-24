@@ -1,9 +1,9 @@
 <?php
 
-require_once 'Model/Post_Info_Aggregator.php';
+require_once 'Model/PostInfoAggregator.php';
 
-require_once 'Controller/Vectorizer.php';
-require_once 'Controller/Classifier.php';
+require_once 'Controller/VectorizerController.php';
+require_once 'Controller/ClassifierController.php';
 
 
 require_once __DIR__ . '/vendor/autoload.php';

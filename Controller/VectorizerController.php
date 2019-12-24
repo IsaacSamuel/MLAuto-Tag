@@ -10,7 +10,7 @@ use Phpml\Tokenization\WhitespaceTokenizer;
 
 
 
-class Vectorizer {
+class VectorizerController {
 
 	public $vectorized_samples;
 
