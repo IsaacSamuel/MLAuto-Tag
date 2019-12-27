@@ -39,7 +39,7 @@ class Classifier {
 
 		//var_dump($sample_labels);
 
-		$classifier = new SVC(Kernel::RBF, $args["cost"], 3, $args["gamma"], 0.0, $args["tolerance"], $args["cache_size"], false, true);
+		$classifier = new SVC(Kernel::RBF, $args["MLAuto_cost"], 3, $args["MLAuto_gamma"], 0.0, $args["MLAuto_tolerance"], $args["MLAuto_cache_size"], false, true);
 		$classifier->train($sample_features, $sample_labels);
 
 		$this->trained_classifier = $classifier;

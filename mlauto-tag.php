@@ -2,7 +2,7 @@
 /*
 Plugin Name: MLAuto Tag
 Plugin URI:  https://github.com/IsaacSamuel/MLAuto-Tag
-Description: This plugin uses machine learning (php-ml) to suggest auto-tags and auto-categorizations for posts. 
+Description: This plugin uses machine learning (php-ml) to automatically categorize posts by taxonomy. Can be used out of the box, or optimized with advanced options.
 Version:     0.1
 Author:      Isaac Samuel
 Author URI:  https://github.com/IsaacSamuel
@@ -45,20 +45,48 @@ class MLAuto_Tag {
 		add_option('MLAuto_tolerance', .001);
 		add_option('MLAuto_cache_size', 100);
 		add_option('MLAuto_label_minimum_count', 1);
-		add_option('MLAuto_delete_old_classifiers', false);
+		add_option('MLAuto_save_old_classifiers', true);
 
 	}
 
+	public function MLAutoTagSettingsMessages($error_message){
+         if ($error_message == 1) {
+                 $message = 'There was an error adding this setting. Please try again.  If this persists, shoot us an email.';
+                 $err_code = esc_attr( 'mlauto_tag_example_setting' );  
+
+                 $setting_field = 'mlauto_tag_example_setting';
+
+         }
+
+         $type = 'error';
+         add_settings_error(
+                $setting_field,
+                $err_code,
+                $message,
+                $type
+            );
+     }
+
+	public function displayPluginAdminSettings() {
+         require_once 'partials/mlauto-tag-admin-settings-display.php';
+    }
+
+	public function addPluginAdminMenu() {
+	add_menu_page(  $this->plugin_name, 'MLAuto Tag', 'administrator', $this->plugin_name, array( $this, 'displayPluginAdminSettings' ) );
+	}
+
+
+
 	private function getConfig() {
 		return array (
-			"taxonomies" => array("category"),
-			"cost" => floatval(get_option('MLAuto_cost')),
-			"gamma" => floatval(get_option('MLAuto_gamma')),
-			"tolerance" => floatval(get_option('MLAuto_tolerance')),
-			"cache_size" => intval(get_option('MLAuto_cache_size')),
-			"delete_old_classifiers" => get_option('MLAuto_delete_old_classifiers', false),
-			"specified_features" => get_option('MLAuto_features'),
-			"label_minimum_count" => get_option('MLAuto_label_minimum_count')
+			"MLAuto_taxonomies" => array("category"),
+			"MLAuto_cost" => floatval(get_option('MLAuto_cost')),
+			"MLAuto_gamma" => floatval(get_option('MLAuto_gamma')),
+			"MLAuto_tolerance" => floatval(get_option('MLAuto_tolerance')),
+			"MLAuto_cache_size" => intval(get_option('MLAuto_cache_size')),
+			"MLAuto_save_old_classifiers" => get_option('MLAuto_save_old_classifiers', false),
+			"MLAuto_specified_features" => get_option('MLAuto_features'),
+			"MLAuto_label_minimum_count" => get_option('MLAuto_label_minimum_count')
 		);
 	}
 
@@ -95,14 +123,13 @@ class MLAuto_Tag {
 
 				echo 'Target: ' . $target . " " . Accuracy::score($test_labels, $predictedLabels, true) . "<br>";
 
-				$args["taxonomy_name"] = $taxonomies[$i];
-				$args["accuracy"] = Accuracy::score($test_labels, $predictedLabels, true);
-				$args["tag_name"] = $target;
-				$args["training_percentage"] = .75;
+				$args["MLAuto_taxonomy_name"] = $taxonomies[$i];
+				$args["MLAuto_accuracy"] = Accuracy::score($test_labels, $predictedLabels, true);
+				$args["MLAuto_tag_name"] = $target;
+				$args["MLAuto_training_percentage"] = .75;
 
 				//Classification::saveClassification($classifier, $args);
 
-				//var_dump($predictedLabels);
 
 
 			}
@@ -119,7 +146,9 @@ class MLAuto_Tag {
 	public function __construct() {
 		$this->init();
 
-		$this->runClassifier();
+
+		//Add actions and hooks
+		add_action('admin_menu', array( $this, 'addPluginAdminMenu' ), 9);    
 
 	}
 
@@ -128,53 +157,5 @@ class MLAuto_Tag {
 //add_action('init', array(__CLASS__, 'main'));
 
 new MLAuto_Tag();
-
-/*
-function wporg_settings_init()
-{
-    // register a new setting for "reading" page
-    register_setting('reading', 'wporg_setting_name');
- 
-    // register a new section in the "reading" page
-    add_settings_section(
-        'wporg_settings_section',
-        'WPOrg Settings Section',
-        'wporg_settings_section_cb',
-        'reading'
-    );
- 
-    // register a new field in the "wporg_settings_section" section, inside the "reading" page
-    add_settings_field(
-        'wporg_settings_field',
-        'WPOrg Setting',
-        'wporg_settings_field_cb',
-        'reading',
-        'wporg_settings_section'
-    );
-}
- 
-/**
- * register wporg_settings_init to the admin_init action hook
- 
-add_action('admin_init', 'wporg_settings_init');
-
-
-// section content cb
-function wporg_settings_section_cb()
-{
-    echo '<p>WPOrg Section Introduction.</p>';
-}
- 
-// field content cb
-function wporg_settings_field_cb()
-{
-    // get the value of the setting we've registered with register_setting()
-    $setting = get_option('wporg_setting_name');
-    // output the field
-    ?>
-    <input type="text" name="wporg_setting_name" value="<?php echo isset( $setting ) ? esc_attr( $setting ) : ''; ?>">
-    <?php
-}
-*/
 
 ?>
