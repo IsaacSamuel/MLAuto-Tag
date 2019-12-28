@@ -59,14 +59,10 @@ class MLAuto_Tag {
 		) );
     }
 
-    public function handleAjax() {
+    public function saveSettings() {
     	$data = $_POST;
 
-
     	try {
-
-    		    	$retval = "";
-
     		if (isset($data["settings"])) {
 		    	foreach ($data["settings"] as $setting) {
 		    		if (isset($setting["name"])) {
@@ -91,34 +87,13 @@ class MLAuto_Tag {
     	wp_die();
     }
 
-	public function displayPluginAdminSettings() {
-         require_once 'partials/mlauto-tag-admin-settings-display.php';
-    }
+    public function generateClassifier() {
 
-	public function addPluginAdminMenu() {
-	add_menu_page(  $this->plugin_name, 'MLAuto Tag', 'administrator', $this->plugin_name, array( $this, 'displayPluginAdminSettings' ) );
-	}
-
-
-
-	private function getConfig() {
-		return array (
-			"MLAuto_taxonomies" => get_option('MLAuto_taxonomies'),
-			"MLAuto_cost" => floatval(get_option('MLAuto_cost')),
-			"MLAuto_gamma" => floatval(get_option('MLAuto_gamma')),
-			"MLAuto_tolerance" => floatval(get_option('MLAuto_tolerance')),
-			"MLAuto_cache_size" => intval(get_option('MLAuto_cache_size')),
-			"MLAuto_save_old_classifiers" => (get_option('MLAuto_save_old_classifiers') == "false" ? false : true) ,
-			"MLAuto_specified_features" => get_option('MLAuto_specified_features'),
-			"MLAuto_label_minimum_count" => get_option('MLAuto_label_minimum_count')
-		);
-	}
-
-	function runClassifier() {
+    	$retval = array();
 
 		$args = $this->getConfig();
 
-		$taxonomies = $args["taxonomies"];//, "post_tag");
+		$taxonomies = $args["MLAuto_taxonomies"];//, "post_tag");
 
 		$info = new PostInfoAggregator($taxonomies);
 
@@ -126,6 +101,8 @@ class MLAuto_Tag {
 
 
 		for ($i=0; $i < count($taxonomies); $i++) { 
+
+			$retval[$taxonomies[$i]] = array();
 
 			foreach($info->targets_collection[$i] as $target) {
 
@@ -145,20 +122,46 @@ class MLAuto_Tag {
 
 				$predictedLabels = $classifier->predict($test_samples, $test_labels);
 
-				echo 'Target: ' . $target . " " . Accuracy::score($test_labels, $predictedLabels, true) . "<br>";
+				$retval[$taxonomies[$i]][$target] = Accuracy::score($test_labels, $predictedLabels, true);
 
-				$args["MLAuto_taxonomy_name"] = $taxonomies[$i];
-				$args["MLAuto_accuracy"] = Accuracy::score($test_labels, $predictedLabels, true);
-				$args["MLAuto_tag_name"] = $target;
-				$args["MLAuto_training_percentage"] = .75;
+				$args["taxonomy_name"] = $taxonomies[$i];
+				$args["accuracy"] = Accuracy::score($test_labels, $predictedLabels, true);
+				$args["tag_name"] = $target;
+				$args["training_percentage"] = .75;
 
-				//Classification::saveClassification($classifier, $args);
+				Classification::saveClassification($classifier, $args);
 
 			}
-			wp_die();
 
+			wp_send_json_success($retval);
+
+			wp_die();
 		}
+
+    }
+
+	public function displayPluginAdminSettings() {
+         require_once 'partials/mlauto-tag-admin-settings-display.php';
+    }
+
+	public function addPluginAdminMenu() {
+	add_menu_page(  $this->plugin_name, 'MLAuto Tag', 'administrator', $this->plugin_name, array( $this, 'displayPluginAdminSettings' ) );
 	}
+
+
+	private function getConfig() {
+		return array (
+			"MLAuto_taxonomies" => get_option('MLAuto_taxonomies'),
+			"MLAuto_cost" => floatval(get_option('MLAuto_cost')),
+			"MLAuto_gamma" => floatval(get_option('MLAuto_gamma')),
+			"MLAuto_tolerance" => floatval(get_option('MLAuto_tolerance')),
+			"MLAuto_cache_size" => intval(get_option('MLAuto_cache_size')),
+			"MLAuto_save_old_classifiers" => (get_option('MLAuto_save_old_classifiers') == "false" ? false : true) ,
+			"MLAuto_specified_features" => get_option('MLAuto_specified_features'),
+			"MLAuto_label_minimum_count" => get_option('MLAuto_label_minimum_count')
+		);
+	}
+
 
 	function init() {
 		$this->buildConfig();
@@ -173,9 +176,8 @@ class MLAuto_Tag {
 
 		add_action('admin_menu', array( $this, 'addPluginAdminMenu' )); 
 
-		add_action( 'wp_ajax_handleAjax', array( $this, 'handleAjax' ) );  
-
- 
+		add_action( 'wp_ajax_saveSettings', array( $this, 'saveSettings' ) );  
+		add_action( 'wp_ajax_generateClassifier', array( $this, 'generateClassifier' ) );  
 
 	}
 

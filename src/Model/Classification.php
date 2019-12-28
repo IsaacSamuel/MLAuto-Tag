@@ -38,16 +38,16 @@ class Classification {
 
 	}
 
-	public function saveClassification(object &$classifier, array $args) {
+	public static function saveClassification(object &$classifier, array $args) {
 		global $wpdb;
 
 		$tag_name = $args["tag_name"];
 		$taxonomy_name = $args["taxonomy_name"];
-		$specified_features = maybe_serialize($args["specified_features"]);
+		$specified_features = maybe_serialize($args["MLAuto_specified_features"]);
 		$accuracy = $args["accuracy"];
-		$gamma = $args["gamma"];
-		$tolerance = $args["tolerance"];
-		$cost = $args["cost"];
+		$gamma = $args["MLAuto_gamma"];
+		$tolerance = $args["MLAuto_tolerance"];
+		$cost = $args["MLAuto_cost"];
 		$training_percentage = $args["training_percentage"];
 
 		$custom_name = ($args["custom_name"] ? $args["custom_name"] : current_time( 'timestamp' ));
