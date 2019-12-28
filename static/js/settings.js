@@ -38,7 +38,7 @@ jQuery( "#save_settings" ).on("click", function( event ) {
 
 	serialized_form = {settings : serialized_form};
 
-	serialized_form["action"] = 'handleAjax';
+	serialized_form["action"] = 'saveSettings';
 
 	//json_form = JSON.stringify(serialized_form);
 
