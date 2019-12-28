@@ -84,7 +84,8 @@ $tolerance = $currentConfiguration["MLAuto_tolerance"];
 
 		            <?php 
 			            echo "<p><a href='#' id='save_settings' class='button button-primary'>Save Settings</a></p>";
-
+			            
+						echo "<p><a href='#' id='generate_classifier' class='button button-primary'>Generate Classifier</a></p>";
 		            ?>  
 		        </form> 
 </div>

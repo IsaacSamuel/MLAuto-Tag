@@ -60,3 +60,29 @@ jQuery( "#save_settings" ).on("click", function( event ) {
 	//After successful save, run classifier button becomes available if it's not already.
 
 })
+
+jQuery( "#generate_classifier" ).on("click", function( event ) {
+
+	//Prevent jumping to the top
+	event.preventDefault();
+
+	var $button = jQuery( this );
+
+	//Click feedback
+    $button.width( $button.width() ).text('...');
+
+
+    var data = {"action" : "generateClassifier"};
+
+
+	jQuery.post( MLAuto_Ajax_Settings.ajaxurl, data, function( response ) {
+
+        console.log(response);
+
+        $button.width( $button.width() ).text('Generate Classifier');
+
+
+    } );
+
+})
+
