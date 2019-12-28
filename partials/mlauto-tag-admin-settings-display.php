@@ -36,7 +36,7 @@ $tolerance = $currentConfiguration["MLAuto_tolerance"];
 		        <div id="icon-themes" class="icon32"></div>  
 		        <h2>MLAuto Tag Settings</h2>  
 				<?php settings_errors(); ?>  
-		        <form method="POST" action="options.php">  
+		        <form id="save_settings_form">  
 
 		        	<h3>Taxonomies</h3>
 		        	<p>Select the taxonomies you'd like to run the classifier upon. <strong>Note:</strong> The classifier runs a lot better on taxonomies with a lot of examples.</p>
@@ -58,18 +58,18 @@ $tolerance = $currentConfiguration["MLAuto_tolerance"];
 	        		<br>
 
 	        		<h3>Save old classifiers?</h3>
-	        		<p>Once a classifier is generated, it is saved to file Depending on various factors, such as the number of features being used to predict classifications, and the number of classifications, these files can get large and/or numerous. If space is a concern, you shouldn't save old classifiers; you should only keep the most recent one. However, if you testing and fiddling with old classifiers to find an optimal mix of features and outputs, there may be value in keeping old classifiers.</p>
+	        		<p>Once a classifier is generated, it is saved to file Depending on various factors, such as the number of features being used to predict classifications, and the number of classifications, these files can get large and/or numerous. If space is a concern, you shouldn't save old classifiers; you should only keep the most recent one. However, if you testing and fiddling with settings to find an optimal mix of settings, there may be value in keeping old classifiers.</p>
 	        		<!--Add current space being taken up-->
-	        		  <input type="radio" id="save_classifiers" name="save_classifier" value="true"
+	        		  <input type="radio" id="save_old_classifiers" name="MLAuto_save_old_classifiers" value="true"
 					         <?php echo (currentConfiguration["MLAuto_save_old_classifiers"] == true ? "checked" : "")?>>
-					  <label for="save_classifier">Save old classifiers</label>
+					  <label for="save_old_classifiers">Save old classifiers</label>
 					  <br>
-					  <input type="radio" id="MLAuto_delete_old_classifiers" name="save_classifier" value="false"
+					  <input type="radio" id="delete_old_classifiers" name="MLAuto_save_old_classifiers" value="false"
 					         <?php echo (currentConfiguration["MLAuto_save_old_classifiers"] == true ? "" : "checked")?> >
-					  <label for="MLAuto_delete_old_classifiers">Keep only the most recent classifier</label>
+					  <label for="delete_old_classifiers">Keep only the most recent classifier</label>
 
 
-		        	<h2>Advanced Options</h2>
+		        	<h3>Advanced Options</h3>
 		        	<p>These options are for users more acquainted with machine learning and statistical methods. MLAuto Tag uses a Support Vector Machine (SVM) with an RBF kernal. You can adjust the parameters of cost, gamma, and tolerance to tweak the algorithm and optimize it to greatness.</p>
 
 		        	<input type="number" id="MLAuto_gamma" name="MLAuto_gamma" value=<?php echo $gamma ?>>
@@ -82,6 +82,9 @@ $tolerance = $currentConfiguration["MLAuto_tolerance"];
 		        	<label for="MLAuto_tolerance">Tolerance (Default: .001)</label>
 
 
-		            <?php submit_button(); ?>  
+		            <?php 
+			            echo "<p><a href='#' id='save_settings' class='button button-primary'>Save Settings</a></p>";
+
+		            ?>  
 		        </form> 
 </div>
