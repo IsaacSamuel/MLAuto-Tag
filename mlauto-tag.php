@@ -39,7 +39,7 @@ class MLAuto_Tag {
 		add_option( "MLAuto_version", "0.1" );
 
 		add_option('MLAuto_taxonomies', array("category"));
-		add_option('MLAuto_features', array("post_title"));
+		add_option('MLAuto_specified_features', array("post_title"));
 		add_option('MLAuto_cost', 1.0);
 		add_option('MLAuto_gamma', null);
 		add_option('MLAuto_tolerance', .001);
@@ -49,23 +49,47 @@ class MLAuto_Tag {
 
 	}
 
-	public function MLAutoTagSettingsMessages($error_message){
-         if ($error_message == 1) {
-                 $message = 'There was an error adding this setting. Please try again.  If this persists, shoot us an email.';
-                 $err_code = esc_attr( 'mlauto_tag_example_setting' );  
 
-                 $setting_field = 'mlauto_tag_example_setting';
+    public function enqueueAdminScripts() {
+   		wp_enqueue_script( 'jquery');
+    	wp_enqueue_script( 'mlauto-settings', plugins_url('static/js/settings.js', __FILE__), array ( 'jquery' ), 1.1, true);
 
-         }
+    	wp_localize_script( 'mlauto-settings', 'MLAuto_Ajax_Settings', array(
+		    'ajaxurl'    => admin_url( 'admin-ajax.php' ),
+		) );
+    }
 
-         $type = 'error';
-         add_settings_error(
-                $setting_field,
-                $err_code,
-                $message,
-                $type
-            );
-     }
+    public function handleAjax() {
+    	$data = $_POST;
+
+
+    	try {
+
+    		    	$retval = "";
+
+    		if (isset($data["settings"])) {
+		    	foreach ($data["settings"] as $setting) {
+		    		if (isset($setting["name"])) {
+		    			update_option($setting["name"], $setting["value"]);
+		    		}
+		    	}
+
+		    	$message = $this->getConfig();
+		    }
+		    else {
+		    	//$this->runClassifier();
+
+		    	$message = "Classifier run";
+		    }
+
+		    wp_send_json_success($message);
+		}
+		catch (Exception $e) {
+			wp_send_json_error('Caught exception: '. $e->getMessage() . "\n");
+		}
+
+    	wp_die();
+    }
 
 	public function displayPluginAdminSettings() {
          require_once 'partials/mlauto-tag-admin-settings-display.php';
@@ -79,13 +103,13 @@ class MLAuto_Tag {
 
 	private function getConfig() {
 		return array (
-			"MLAuto_taxonomies" => array("category"),
+			"MLAuto_taxonomies" => get_option('MLAuto_taxonomies'),
 			"MLAuto_cost" => floatval(get_option('MLAuto_cost')),
 			"MLAuto_gamma" => floatval(get_option('MLAuto_gamma')),
 			"MLAuto_tolerance" => floatval(get_option('MLAuto_tolerance')),
 			"MLAuto_cache_size" => intval(get_option('MLAuto_cache_size')),
-			"MLAuto_save_old_classifiers" => get_option('MLAuto_save_old_classifiers', false),
-			"MLAuto_specified_features" => get_option('MLAuto_features'),
+			"MLAuto_save_old_classifiers" => (get_option('MLAuto_save_old_classifiers') == "false" ? false : true) ,
+			"MLAuto_specified_features" => get_option('MLAuto_specified_features'),
 			"MLAuto_label_minimum_count" => get_option('MLAuto_label_minimum_count')
 		);
 	}
@@ -130,8 +154,6 @@ class MLAuto_Tag {
 
 				//Classification::saveClassification($classifier, $args);
 
-
-
 			}
 			wp_die();
 
@@ -146,9 +168,14 @@ class MLAuto_Tag {
 	public function __construct() {
 		$this->init();
 
-
 		//Add actions and hooks
-		add_action('admin_menu', array( $this, 'addPluginAdminMenu' ), 9);    
+		add_action( 'admin_enqueue_scripts',  array( $this, 'enqueueAdminScripts'));
+
+		add_action('admin_menu', array( $this, 'addPluginAdminMenu' )); 
+
+		add_action( 'wp_ajax_handleAjax', array( $this, 'handleAjax' ) );  
+
+ 
 
 	}
 
