@@ -39,7 +39,7 @@ $tolerance = $currentConfiguration["MLAuto_tolerance"];
 		        <form id="save_settings_form">  
 
 		        	<h3>Taxonomies</h3>
-		        	<p>Select the taxonomies you'd like to run the classifier upon. <strong>Note:</strong> The classifier runs a lot better on taxonomies with a lot of examples.</p>
+		        	<p>Select the taxonomies you'd like to run the classifier upon. <strong>Note:</strong> The classifier runs a lot better on taxonomies with a lot of examples. Taxonomies with very few matching posts will not be predicted well.</p>
 	        		<?php foreach ($taxonomy_names as $name) { ?>
 	        			<input type=checkbox name="taxonomies" value=<?php echo '"' . $name . '" ' . (in_array($name, $currentConfiguration["MLAuto_taxonomies"]) ? "checked" : "" ) ?> id = <?php echo $name ?> > 
 	        			<label for=<?php echo '"' . $name . '"' ?>><?php echo $name ?> </label>
@@ -48,7 +48,7 @@ $tolerance = $currentConfiguration["MLAuto_tolerance"];
 	        		<br>
 
 	        		<h3>Features</h3>
-		        	<p>Features are the data that the classifier will use to predict which classification(s) your post belongs in. The more features, the more accurate the classifier will get in general, but the longer it will take to run.</p>
+		        	<p>Features are the data that the classifier will use to predict which classification(s) your post belongs in. The more numberous and less random the features, the more accurate the classifier will get in general, but the longer it will take to run.</p>
 	        		
 	        		<?php foreach ($features as $feature) { ?>
 	        			<input type=checkbox name="features" value=<?php echo '"' . $feature . '" ' . (in_array($feature, $currentConfiguration["MLAuto_specified_features"]) ? "checked" : "" ) ?> id = <?php echo $feature ?> > 
