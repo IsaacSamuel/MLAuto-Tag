@@ -41,11 +41,17 @@ class Vectorizer {
 
 	private function vectorize_samples($sample_features) : array {
 
-		$sample_vectorizer = new TokenCountVectorizer(new WhitespaceTokenizer());
-		$sample_vectorizer->fit($sample_features);
-		$sample_vectorizer->transform($sample_features);
+		$vectorized_features = array();
 
-		return $sample_features;
+		foreach($sample_features as $feature) {
+			$sample_vectorizer = new TokenCountVectorizer(new WhitespaceTokenizer());
+			$sample_vectorizer->fit($feature);
+			$sample_vectorizer->transform($feature);
+
+			array_push($vectorized_features, $feature);
+		}
+
+		return $vectorized_features;
 	}
 
 	public function __construct(array $sample_features) {

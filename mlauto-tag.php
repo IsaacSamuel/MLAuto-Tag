@@ -73,9 +73,7 @@ class MLAuto_Tag {
 		    	$message = $this->getConfig();
 		    }
 		    else {
-		    	//$this->runClassifier();
-
-		    	$message = "Classifier run";
+		    	wp_send_json_error('Could not detect a settings option.');
 		    }
 
 		    wp_send_json_success($message);
@@ -93,11 +91,68 @@ class MLAuto_Tag {
 
 		$args = $this->getConfig();
 
-		$taxonomies = $args["MLAuto_taxonomies"];//, "post_tag");
+		$taxonomies = $args["MLAuto_taxonomies"];
 
-		$info = new PostInfoAggregator($taxonomies);
+		$info = new PostInfoAggregator($taxonomies, $args["MLAuto_specified_features"]);
 
 		$vectorizer = new Vectorizer($info->features);
+
+		$args["custom_name"] = current_time( 'timestamp' );
+
+				
+		for ($i=0; $i < count($taxonomies); $i++) { 
+
+			$retval[$taxonomies[$i]] = array();
+
+			foreach($info->targets_collection[$i] as $target) {
+
+				$labels = array_column($info->labels_collection, $i);
+
+				$vectorized_labels = $vectorizer->vectorize_labels($labels, $target);
+
+
+				$train_samples = array_slice($vectorizer->vectorized_samples, 0, 60);
+				$train_labels = array_slice($vectorized_labels, 0, 60);
+
+				$test_samples = array_slice($vectorizer->vectorized_samples, 60);
+				$test_labels = array_slice($vectorized_labels, 60);
+
+				$classifier = new Classifier($train_samples, $train_labels, $args);
+				$classifier->trainClassifier($train_samples, $train_labels, $args);
+
+				$predictedLabels = $classifier->predict($test_samples, $test_labels);
+
+				$retval[$taxonomies[$i]][$target] = Accuracy::score($test_labels, $predictedLabels, true);
+
+				$args["taxonomy_name"] = $taxonomies[$i];
+				$args["accuracy"] = Accuracy::score($test_labels, $predictedLabels, true);
+				$args["tag_name"] = $target;
+				$args["training_percentage"] = .75;
+
+				Classification::saveClassification($classifier, $args);
+
+			}
+
+		}
+
+		wp_send_json_success($retval);
+
+		wp_die();
+    }
+
+    /*private function testClassifier() {
+
+    	$retval = array();
+
+		$args = $this->getConfig();
+
+		$taxonomies = $args["MLAuto_taxonomies"];//, "post_tag");
+
+		$info = new PostInfoAggregator($taxonomies, $args["MLAuto_specified_features"]);
+
+		$vectorizer = new Vectorizer($info->features);
+
+		$args["custom_name"] = current_time( 'timestamp' );
 
 
 		for ($i=0; $i < count($taxonomies); $i++) { 
@@ -133,12 +188,12 @@ class MLAuto_Tag {
 
 			}
 
-			wp_send_json_success($retval);
-
-			wp_die();
 		}
 
-    }
+		var_dump($retval);
+
+		wp_die();
+    }*/
 
 	public function displayPluginAdminSettings() {
          require_once 'partials/mlauto-tag-admin-settings-display.php';
@@ -169,7 +224,11 @@ class MLAuto_Tag {
 	}
 
 	public function __construct() {
+		update_option("MLAuto_taxonomies", array("category", "post_tag"));
+
 		$this->init();
+
+		//$this->testClassifier();
 
 		//Add actions and hooks
 		add_action( 'admin_enqueue_scripts',  array( $this, 'enqueueAdminScripts'));

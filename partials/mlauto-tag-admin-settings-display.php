@@ -58,7 +58,7 @@ $tolerance = $currentConfiguration["MLAuto_tolerance"];
 	        		<br>
 
 	        		<h3>Save old classifiers?</h3>
-	        		<p>Once a classifier is generated, it is saved to file Depending on various factors, such as the number of features being used to predict classifications, and the number of classifications, these files can get large and/or numerous. If space is a concern, you shouldn't save old classifiers; you should only keep the most recent one. However, if you testing and fiddling with settings to find an optimal mix of settings, there may be value in keeping old classifiers.</p>
+	        		<p>Once a classifier is generated, it is saved to file. Depending on various factors, such as the number of features being used to predict classifications, and the number of classifications, these files can get large and/or numerous. If space is a concern, you shouldn't save old classifiers; you should only keep the most recent one. However, if you testing and fiddling with settings to find an optimal mix of settings, there may be value in keeping old classifiers.</p>
 	        		<!--Add current space being taken up-->
 	        		  <input type="radio" id="save_old_classifiers" name="MLAuto_save_old_classifiers" value="true"
 					         <?php echo (currentConfiguration["MLAuto_save_old_classifiers"] == true ? "checked" : "")?>>
