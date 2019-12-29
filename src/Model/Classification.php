@@ -50,7 +50,7 @@ class Classification {
 		$cost = $args["MLAuto_cost"];
 		$training_percentage = $args["training_percentage"];
 
-		$custom_name = ($args["custom_name"] ? $args["custom_name"] : current_time( 'timestamp' ));
+		$custom_name = $args["custom_name"];
 
 		$dir_of_serialized_object = 'bin/' . $custom_name . '/'.  $taxonomy_name . '/';
 
