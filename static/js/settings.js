@@ -54,11 +54,6 @@ jQuery( "#save_settings" ).on("click", function( event ) {
        	$button.width( $button.width() ).text('Save Settings');
     } );
 	
-
-
-
-	//After successful save, run classifier button becomes available if it's not already.
-
 })
 
 jQuery( "#generate_classifier" ).on("click", function( event ) {
