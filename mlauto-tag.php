@@ -144,7 +144,7 @@ class MLAuto_Tag {
 		wp_die();
     }
 
-    /*private function testClassifier() {
+    private function testClassifier() {
 
     	$retval = array();
 
@@ -210,7 +210,20 @@ class MLAuto_Tag {
 		var_dump($retval);
 
 		wp_die();
-    }*/
+    }
+
+    public function displayPluginMetaBox() {
+    	require_once 'partials/mlauto-meta-box.php';
+    }
+
+    public function addPluginMetaBox() {
+		add_meta_box( 'mlauto-classify-post', // ID attribute of metabox
+                  'MLAuto Classify Post',       // Title of metabox visible to user
+                  array($this, 'displayPluginMetaBox'), // Function that prints box in wp-admin
+                  'post',              // Show box for posts, pages, custom, etc.
+                  'normal',            // Where on the page to show the box
+                  'low' );            // Priority of box in display order
+    }
 
 	public function displayPluginAdminSettings() {
          require_once 'partials/mlauto-tag-admin-settings-display.php';
@@ -221,7 +234,7 @@ class MLAuto_Tag {
 	}
 
 
-	private function getConfig() {
+	public static function getConfig() {
 		return array (
 			"MLAuto_taxonomies" => get_option('MLAuto_taxonomies'),
 			"MLAuto_cost" => floatval(get_option('MLAuto_cost')),
@@ -256,7 +269,9 @@ class MLAuto_Tag {
 		add_action('admin_menu', array( $this, 'addPluginAdminMenu' )); 
 
 		add_action( 'wp_ajax_saveSettings', array( $this, 'saveSettings' ) );  
-		add_action( 'wp_ajax_generateClassifier', array( $this, 'generateClassifier' ) );  
+		add_action( 'wp_ajax_generateClassifier', array( $this, 'generateClassifier' ) ); 
+
+		add_action( 'add_meta_boxes', array($this, 'addPluginMetaBox') );
 
 	}
 

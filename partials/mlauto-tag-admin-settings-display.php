@@ -20,7 +20,7 @@ $currentConfiguration = $this->getConfig();
 $taxonomies = get_taxonomies(array("_built_in" => false), "names");
 $taxonomy_names = array_keys($taxonomies);
 array_unshift($taxonomy_names, "category");
-array_unshift($taxonomy_names, "post_tags");
+array_unshift($taxonomy_names, "post_tag");
 
 //For now, we're hardcoding the potential features. Not many are supported.
 $features = array("post_title", "post_content");
