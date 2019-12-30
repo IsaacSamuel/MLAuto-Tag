@@ -15,18 +15,16 @@ require 'class_loader.php';
 use mlauto\Model\PostInfoAggregator;
 use mlauto\Model\Classification;
 
-
 use mlauto\Analysis\Vectorizer;
 use mlauto\Analysis\Classifier;
 
 
 
 use Phpml\Metric\Accuracy;
-use Phpml\Classification\NaiveBayes;
-
-use Phpml\CrossValidation\StratifiedRandomSplit;
-
 use Phpml\Metric\ClassificationReport;
+
+use Phpml\Dataset\ArrayDataset;
+use Phpml\CrossValidation\RandomSplit;
 
 
 
@@ -40,6 +38,7 @@ class MLAuto_Tag {
 
 		add_option('MLAuto_taxonomies', array("category"));
 		add_option('MLAuto_specified_features', array("post_title"));
+		add_option('MLAuto_test_percentage', .3);
 		add_option('MLAuto_cost', 1.0);
 		add_option('MLAuto_gamma', null);
 		add_option('MLAuto_tolerance', .001);
@@ -110,12 +109,18 @@ class MLAuto_Tag {
 
 				$vectorized_labels = $vectorizer->vectorize_labels($labels, $target);
 
+				$dataset = new ArrayDataset($vectorizer->vectorized_samples, $vectorized_labels);
 
-				$train_samples = array_slice($vectorizer->vectorized_samples, 0, 60);
-				$train_labels = array_slice($vectorized_labels, 0, 60);
+				$randomizedDataset = new RandomSplit($dataset, $args['MLAuto_test_percentage']);
 
-				$test_samples = array_slice($vectorizer->vectorized_samples, 60);
-				$test_labels = array_slice($vectorized_labels, 60);
+				//train group
+				$train_samples = $randomizedDataset->getTrainSamples();
+				$train_labels = $randomizedDataset->getTrainLabels();
+
+				//test group
+				$test_samples = $randomizedDataset->getTestSamples();
+				$test_labels = $randomizedDataset->getTestLabels();
+
 
 				$classifier = new Classifier($train_samples, $train_labels, $args);
 				$classifier->trainClassifier($train_samples, $train_labels, $args);
@@ -127,7 +132,6 @@ class MLAuto_Tag {
 				$args["taxonomy_name"] = $taxonomies[$i];
 				$args["accuracy"] = Accuracy::score($test_labels, $predictedLabels, true);
 				$args["tag_name"] = $target;
-				$args["training_percentage"] = .75;
 
 				Classification::saveClassification($classifier, $args);
 
@@ -166,19 +170,32 @@ class MLAuto_Tag {
 				$vectorized_labels = $vectorizer->vectorize_labels($labels, $target);
 
 
-				$train_samples = array_slice($vectorizer->vectorized_samples, 0, 60);
-				$train_labels = array_slice($vectorized_labels, 0, 60);
+				$dataset = new ArrayDataset($vectorizer->vectorized_samples, $vectorized_labels);
 
-				$test_samples = array_slice($vectorizer->vectorized_samples, 60);
-				$test_labels = array_slice($vectorized_labels, 60);
+				$randomizedDataset = new RandomSplit($dataset, 0.2);
 
+				//train group
+				$train_samples = $randomizedDataset->getTrainSamples();
+				$train_labels = $randomizedDataset->getTrainLabels();
+
+				//test group
+				$test_samples = $randomizedDataset->getTestSamples();
+				$test_labels = $randomizedDataset->getTestLabels();
+
+
+				//Classify
 				$classifier = new Classifier($train_samples, $train_labels, $args);
 				$classifier->trainClassifier($train_samples, $train_labels, $args);
 
+				//Test
 				$predictedLabels = $classifier->predict($test_samples, $test_labels);
 
+
+				//Return accuracy
 				$retval[$taxonomies[$i]][$target] = Accuracy::score($test_labels, $predictedLabels, true);
 
+
+				//Save classifier info to database, and classifier binary to file
 				$args["taxonomy_name"] = $taxonomies[$i];
 				$args["accuracy"] = Accuracy::score($test_labels, $predictedLabels, true);
 				$args["tag_name"] = $target;
@@ -213,18 +230,21 @@ class MLAuto_Tag {
 			"MLAuto_cache_size" => intval(get_option('MLAuto_cache_size')),
 			"MLAuto_save_old_classifiers" => (get_option('MLAuto_save_old_classifiers') == "false" ? false : true) ,
 			"MLAuto_specified_features" => get_option('MLAuto_specified_features'),
-			"MLAuto_label_minimum_count" => get_option('MLAuto_label_minimum_count')
+			"MLAuto_label_minimum_count" => get_option('MLAuto_label_minimum_count'),
+			"MLAuto_test_percentage" => floatval(get_option('MLAuto_test_percentage'))
 		);
 	}
 
 
-	function init() {
+	private function init() {
+		//If we haven't set the default classification configuration, configure it
 		$this->buildConfig();
+
+		//If SQL Table isn't initiated, initiate it
 		Classification::intializeTable();
 	}
 
 	public function __construct() {
-		update_option("MLAuto_taxonomies", array("category", "post_tag"));
 
 		$this->init();
 

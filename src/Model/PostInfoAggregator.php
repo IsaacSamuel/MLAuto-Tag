@@ -31,17 +31,8 @@ class PostInfoAggregator {
 		$o .= "<br><br>";
 
 		return $o;
-
 	}
 
-
-	private function lower_case_array(array &$array) : void {
-		
-		for ($i=0; $i < count($array); $i++) { 
-			$array[$i] = strtolower($array[$i]);
-		}
-
-	}
 
 	//Take wordpress terms, convert them to lowercase, and connect multi-word terms with an underscore
 	private function cleanTerms($terms) {
@@ -59,6 +50,7 @@ class PostInfoAggregator {
 		return $term_names;
 	}
 
+
 	private function extract_post_features(Object &$post, array $feature_names) {
 		$post_features = array();
 
@@ -70,7 +62,7 @@ class PostInfoAggregator {
 	}
 
 
-	function extract_post_attributes(array $taxonomies, array $feature_names): void {
+	private function extract_post_attributes(array $taxonomies, array $feature_names): void {
 		
 		$this->features = array();
 
@@ -104,14 +96,13 @@ class PostInfoAggregator {
 
 	}
 
-	function extract_targets_collection(array $taxonomies): void {
+	private function extract_targets_collection(array $taxonomies): void {
 
 		$this->targets_collection = array();
 
 		$args = array(
 		    'hide_empty' => true,
 		);
-
 
 
 		foreach ($taxonomies as $taxonomy) {
@@ -141,7 +132,6 @@ class PostInfoAggregator {
 		$this->extract_targets_collection($taxonomies);
 
 		$this->extract_post_attributes($taxonomies, $specified_features);
-
 	}
 
 }

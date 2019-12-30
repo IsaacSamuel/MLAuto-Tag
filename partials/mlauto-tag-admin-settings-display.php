@@ -29,6 +29,7 @@ $features = array("post_title", "post_content");
 $gamma = ($currentConfiguration["MLAuto_gamma"] == null ? 0 : $currentConfiguration["MLAuto_gamma"] );
 $cost = $currentConfiguration["MLAuto_cost"];
 $tolerance = $currentConfiguration["MLAuto_tolerance"];
+$test_percentage = $currentConfiguration["MLAuto_test_percentage"];
 
 ?>
 
@@ -71,15 +72,22 @@ $tolerance = $currentConfiguration["MLAuto_tolerance"];
 
 		        	<h3>Advanced Options</h3>
 		        	<p>These options are for users more acquainted with machine learning and statistical methods. MLAuto Tag uses a Support Vector Machine (SVM) with an RBF kernal. You can adjust the parameters of cost, gamma, and tolerance to tweak the algorithm and optimize it to greatness.</p>
+		        	<p>Additionally, you can adjust the size of the test set, which is used to determine how accurate the classifier is. The smaller the test set, the more accurate the classifier is, but the less certain you can be of the feedback.</p>
 
 		        	<input type="number" id="MLAuto_gamma" name="MLAuto_gamma" value=<?php echo $gamma ?>>
 		        	<label for="MLAuto_gamma">Gamma (Default: 0, meaning (1/features)</label>
+		        	<br>
 
-		        	<input type="number" id="MLAuto_cost" name="MLAuto_cost" value=<?php echo $cost ?>>
+		        	<input type="text" id="MLAuto_cost" name="MLAuto_cost" value=<?php echo $cost ?>>
 		        	<label for="MLAuto_cost">Cost (Default: 1.0)</label>
+		        	<br>
 
 		        	<input type="number" id="MLAuto_tolerance" name="MLAuto_tolerance" value=<?php echo $tolerance ?>>
 		        	<label for="MLAuto_tolerance">Tolerance (Default: .001)</label>
+
+		        	<br>
+		        	<input type="text" id="MLAuto_test_percentage" name="MLAuto_test_percentage" value=<?php echo $test_percentage ?>>
+		        	<label for="MLAuto_test_percentage">Test Percentage Size (Default: .2 (20%))</label>
 
 
 		            <?php 
