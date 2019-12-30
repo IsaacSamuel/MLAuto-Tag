@@ -48,7 +48,7 @@ class Classification {
 		$gamma = $args["MLAuto_gamma"];
 		$tolerance = $args["MLAuto_tolerance"];
 		$cost = $args["MLAuto_cost"];
-		$training_percentage = $args["training_percentage"];
+		$training_percentage = $args["MLAuto_test_percentage"];
 
 		$custom_name = $args["custom_name"];
 
