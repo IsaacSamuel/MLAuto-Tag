@@ -25,7 +25,6 @@ array_unshift($taxonomy_names, "post_tag");
 //For now, we're hardcoding the potential features. Not many are supported.
 $features = array("post_title", "post_content");
 
-
 $gamma = ($currentConfiguration["MLAuto_gamma"] == null ? 0 : $currentConfiguration["MLAuto_gamma"] );
 $cost = $currentConfiguration["MLAuto_cost"];
 $tolerance = $currentConfiguration["MLAuto_tolerance"];

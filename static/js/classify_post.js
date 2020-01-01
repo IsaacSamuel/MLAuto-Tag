@@ -15,18 +15,18 @@ function mlauto_createTermList(terms) {
 		//let term_item = document.createElement("div").addClass("mlauto_term_item");
 
 		//In each subdiv, display checkbox with value of term name and id of term name.
-			//let checkbox = document.createElement("input");
-			//checkbox.addAttribute("type", "checkbox");
-			//checkbox.addID(term.key());
-			//checkbox.addName(term.key());
-			//checkbox.addValue(term.key());
-			//If the term is already selected, display it as checked
-			//checkbox.checked = term.value()[1];
-			
-			//let label = document.createElement("input");
-			//label.addAttribute("for", term.key());
-			//Display name of term and predicted probability of match
-			//label.innerHTML = term.key() + ": " + term.value()[0] 
+		//let checkbox = document.createElement("input");
+		//checkbox.addAttribute("type", "checkbox");
+		//checkbox.addID(term.key());
+		//checkbox.addName(term.key());
+		//checkbox.addValue(term.key());
+		//If the term is already selected, display it as checked
+		//checkbox.checked = term.value()[1];
+		
+		//let label = document.createElement("input");
+		//label.addAttribute("for", term.key());
+		//Display name of term and predicted probability of match
+		//label.innerHTML = term.key() + ": " + term.value()[0] 
 
 
 		//term_item.addChild(checkbox);
@@ -48,13 +48,14 @@ jQuery( "#classify_post" ).on("click", function( event ) {
 	var $button = jQuery( this );
 	$button.width( $button.width() ).text('...');
 
-	let data = {"action" : "classifyPost"}
+	let data = {
+			"action" : "classifyPost",
+		}
 
 	//Get post id
-	//data["post_id"] = 
+	data["post_id"] = getElementByID("mlauto-meta-box").getAttribute("rel");
 
 	//AJAX - send post id to classifyPost AJAX action
-
 	jQuery.post( MLAuto_Ajax_Settings.ajaxurl, data, function( response ) {
 
 		/*
@@ -81,7 +82,7 @@ jQuery( "#classify_post" ).on("click", function( event ) {
 			//Find content div
 			let container_div = jQuery("#mlauto-meta-box-content");
 			//Erase contents
-			let container_div.innerHTML = "";
+			container_div.innerHTML = "";
 
 			//For each taxonomy
 			response.data.forEach(function(taxonomy) {
