@@ -35,12 +35,12 @@ class PostInfoAggregator {
 
 
 	//Take wordpress terms, convert them to lowercase, and connect multi-word terms with an underscore
-	public static function cleanTerms($terms) {
+	private function cleanTerms($terms) {
 		if ($terms) {
 			$term_names = "";
 
 			foreach ($terms as $term) {
-				$term_names .= ' ' . str_replace(" ", "_", strtolower($term->name));
+				$term_names .= ' ' . $term->slug;
 			}
 		}
 		else {
@@ -121,7 +121,7 @@ class PostInfoAggregator {
 
 
 			foreach ($terms as $term) {
-				$term_names = str_replace(" ", "_", strtolower($term->name));
+				$term_names = $term->slug;
 
 				array_push($taxonomy_terms, $term_names);
 
