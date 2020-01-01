@@ -52,98 +52,19 @@ class MLAuto_Tag {
     public function enqueueAdminScripts() {
    		wp_enqueue_script( 'jquery');
     	wp_enqueue_script( 'mlauto-settings', plugins_url('static/js/settings.js', __FILE__), array ( 'jquery' ), 1.1, true);
+    	wp_enqueue_script( 'mlauto-classify-post', plugins_url('static/js/classify_post.js', __FILE__), array ( 'jquery' ), 1.1, true);
+
 
     	wp_localize_script( 'mlauto-settings', 'MLAuto_Ajax_Settings', array(
 		    'ajaxurl'    => admin_url( 'admin-ajax.php' ),
 		) );
+
+		wp_localize_script( 'mlauto-classify-post', 'MLAuto_Ajax_Settings', array(
+		    'ajaxurl'    => admin_url( 'admin-ajax.php' ),
+		) );
     }
 
-    public function saveSettings() {
-    	$data = $_POST;
-
-    	try {
-    		if (isset($data["settings"])) {
-		    	foreach ($data["settings"] as $setting) {
-		    		if (isset($setting["name"])) {
-		    			update_option($setting["name"], $setting["value"]);
-		    		}
-		    	}
-
-		    	$message = $this->getConfig();
-		    }
-		    else {
-		    	wp_send_json_error('Could not detect a settings option.');
-		    }
-
-		    wp_send_json_success($message);
-		}
-		catch (Exception $e) {
-			wp_send_json_error('Caught exception: '. $e->getMessage() . "\n");
-		}
-
-    	wp_die();
-    }
-
-    public function generateClassifier() {
-
-    	$retval = array();
-
-		$args = $this->getConfig();
-
-		$taxonomies = $args["MLAuto_taxonomies"];
-
-		$info = new PostInfoAggregator($taxonomies, $args["MLAuto_specified_features"]);
-
-		$vectorizer = new Vectorizer($info->features);
-
-		$args["custom_name"] = current_time( 'timestamp' );
-
-				
-		for ($i=0; $i < count($taxonomies); $i++) { 
-
-			$retval[$taxonomies[$i]] = array();
-
-			foreach($info->targets_collection[$i] as $target) {
-
-				$labels = array_column($info->labels_collection, $i);
-
-				$vectorized_labels = $vectorizer->vectorize_labels($labels, $target);
-
-				$dataset = new ArrayDataset($vectorizer->vectorized_samples, $vectorized_labels);
-
-				$randomizedDataset = new RandomSplit($dataset, $args['MLAuto_test_percentage']);
-
-				//train group
-				$train_samples = $randomizedDataset->getTrainSamples();
-				$train_labels = $randomizedDataset->getTrainLabels();
-
-				//test group
-				$test_samples = $randomizedDataset->getTestSamples();
-				$test_labels = $randomizedDataset->getTestLabels();
-
-
-				$classifier = new Classifier($train_samples, $train_labels, $args);
-				$classifier->trainClassifier($train_samples, $train_labels, $args);
-
-				$predictedLabels = $classifier->predict($test_samples, $test_labels);
-
-				$retval[$taxonomies[$i]][$target] = Accuracy::score($test_labels, $predictedLabels, true);
-
-				$args["taxonomy_name"] = $taxonomies[$i];
-				$args["accuracy"] = Accuracy::score($test_labels, $predictedLabels, true);
-				$args["tag_name"] = $target;
-
-				Classification::saveClassification($classifier, $args);
-
-			}
-
-		}
-
-		wp_send_json_success($retval);
-
-		wp_die();
-    }
-
+/*
     private function testClassifier() {
 
     	$retval = array();
@@ -211,6 +132,8 @@ class MLAuto_Tag {
 
 		wp_die();
     }
+*/
+
 
     public function displayPluginMetaBox() {
     	require_once 'partials/mlauto-meta-box.php';
@@ -267,11 +190,7 @@ class MLAuto_Tag {
 		add_action( 'admin_enqueue_scripts',  array( $this, 'enqueueAdminScripts'));
 
 		add_action('admin_menu', array( $this, 'addPluginAdminMenu' )); 
-
-		add_action( 'wp_ajax_saveSettings', array( $this, 'saveSettings' ) );  
-		add_action( 'wp_ajax_generateClassifier', array( $this, 'generateClassifier' ) ); 
-
-		add_action( 'add_meta_boxes', array($this, 'addPluginMetaBox') );
+		add_action('add_meta_boxes', array($this, 'addPluginMetaBox') );
 
 	}
 
