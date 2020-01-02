@@ -53,11 +53,16 @@ jQuery( "#classify_post" ).on("click", function( event ) {
 		}
 
 	//Get post id
-	data["post_id"] = getElementByID("mlauto-meta-box").getAttribute("rel");
+	data["post_id"] = document.getElementById("mlauto-meta-box").getAttribute("rel");
+
+	console.log(data);
 
 	//AJAX - send post id to classifyPost AJAX action
-	jQuery.post( MLAuto_Ajax_Settings.ajaxurl, data, function( response ) {
+	jQuery.post( MLAuto_Ajax_Settings.ajaxurl, data)
 
+		.done( function(response ) {
+
+		console.log(response)
 		/*
 		Structure of return data:
 		{
@@ -107,8 +112,14 @@ jQuery( "#classify_post" ).on("click", function( event ) {
 		//Put button back to normal
 		$button.width( $button.width() ).text('Classify Post');
 
-	}
+	})
+	.fail(function(xhr, status, error) {
+		let container_div = document.getElementById("mlauto-meta-box-content");
 
-}
+		container_div.innerHTML = xhr.responseText;
+
+		$button.width( $button.width() ).text('Classify Post');
+    });
+});
 
 //Now pat yourself on the back, because beta is complete. :-)

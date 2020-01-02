@@ -19,17 +19,22 @@ class Classifier {
 		$modelManager->saveToFile($this->trained_classifier, $filePath);
 	}
 
-	public function restore($filepath) {
+	public function restore(String $filepath) {
+		$modelManager = new ModelManager();
 		$restoredClassifier = $modelManager->restoreFromFile($filepath);
 
 		$this->trained_classifier =  $restoredClassifier;
 	}
 
+	public function predictProbability(array &$sample) {
+		$probability = $this->trained_classifier->predictProbability($sample);
+
+		return $probability;
+	}
 
 	public function predict(array &$test_features) {
 
 		$predictedLabels = $this->trained_classifier->predict($test_features);
-
 
 		return $predictedLabels;
 	}
