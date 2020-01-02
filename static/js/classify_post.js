@@ -1,41 +1,50 @@
 function mlauto_createTermList(terms) {
 
 	/*
-		{
-			[Term: [Prediction, Already checked]]
-			"Advocacy" : [97%, true]
-			"Legal" : [85%, false]
+		[
+			{name: termName, probabilities: Object(0:false probability, 1:true probability), checked:  is term checked? }
+			{name: "Advocacy", probabilities: {0: .03, 1: 97%}, checked: true}
+			{name: "Legal", ...}
 			...
-		}
+		]
 	*/
 
-	//let term_list = document.createElement("div").addClass("mlauto_term_list");
+	let term_list = document.createElement("div")
+	term_list.classList.add("mlauto_term_list");
 
-	//terms.forEach(function(term){
-		//let term_item = document.createElement("div").addClass("mlauto_term_item");
+	terms.forEach(function(term){
+		console.log(term)
+		let term_item = document.createElement("div")
+		term_item.classList.add("mlauto_term_item");
 
 		//In each subdiv, display checkbox with value of term name and id of term name.
-		//let checkbox = document.createElement("input");
-		//checkbox.addAttribute("type", "checkbox");
-		//checkbox.addID(term.key());
-		//checkbox.addName(term.key());
-		//checkbox.addValue(term.key());
+		let checkbox = document.createElement("input");
+		let term_name = term["name"]
+		checkbox.setAttribute("type", "checkbox");
+		checkbox.setAttribute("id", term_name);
+		checkbox.setAttribute("name", term_name);
+		checkbox.setAttribute("value", term_name);
 		//If the term is already selected, display it as checked
-		//checkbox.checked = term.value()[1];
+		checkbox.checked = term["checked"];
 		
-		//let label = document.createElement("input");
-		//label.addAttribute("for", term.key());
+		let label = document.createElement("label");
+		label.setAttribute("for", term_name);
 		//Display name of term and predicted probability of match
-		//label.innerHTML = term.key() + ": " + term.value()[0] 
+		label.innerHTML = term_name + ": <strong>" + ((1 - term["probabilities"]["0"]) * 100).toFixed(2) + "%</strong>";
 
+		term_item.appendChild(checkbox);
+		term_item.appendChild(label);
 
-		//term_item.addChild(checkbox);
-		//term_item.addChild(label);
+		term_list.appendChild(term_item);
+	})
 
-		//term_list.addChild(term_item);
-	//})
+	return term_list;
+}
 
-	//return term_list;
+function mlauto_sortByProbability(term1, term2) {
+	if (term1["probabilities"]["0"] > term2["probabilities"]["0"]) { return 1}
+	if (term1["probabilities"]["0"] < term2["probabilities"]["0"]) { return -1}
+	return 0
 }
 
 
@@ -55,62 +64,70 @@ jQuery( "#classify_post" ).on("click", function( event ) {
 	//Get post id
 	data["post_id"] = document.getElementById("mlauto-meta-box").getAttribute("rel");
 
-	console.log(data);
 
 	//AJAX - send post id to classifyPost AJAX action
 	jQuery.post( MLAuto_Ajax_Settings.ajaxurl, data)
 
 		.done( function(response ) {
 
-		console.log(response)
-		/*
-		Structure of return data:
-		{
-			success : true / false
-			data :
-				{
-					[Taxonomy Name : Predictions]
-					"category" :
-						{
-							[Term: [Prediction, Already checked]]
-							"Advocacy" : [97%, true]
-							"Legal" : [85%, false]
-							...
-						}
-					...
-				}
-		}
-		*/
+			console.log(response)
+			/*
+			Structure of return data:
+			[
+				success : true / false
+				data :
+					{
+						[Taxonomy Name : Predictions]
+						"category" :
+							{
+								[Term: [Prediction, Already checked]]
+								"Advocacy" : [97%, true]
+								"Legal" : [85%, false]
+								...
+							}
+						...
+					}
+			]
+			*/
 
-		//If success
-		if (response.success) {
-			//Find content div
-			let container_div = jQuery("#mlauto-meta-box-content");
-			//Erase contents
-			container_div.innerHTML = "";
+			//If success
+			if (response.success) {
+				//Find content div
+				let container_div = document.getElementById("mlauto-meta-box-content");
+				//Erase contents
+				container_div.innerHTML = "";
 
-			//For each taxonomy
-			response.data.forEach(function(taxonomy) {
-				//Create div
-				//let taxonomy_div = document.createElement("div").addClass("mlauto_taxonomy_div");
+				//For each taxonomy
+				Object.entries(response.data).forEach(function(taxonomy) {
 
-				//Inside div, create h3 with name of taxonomy, capitilize first letter
-				//let taxonomy_name = document.createElement("h3");
-				//let taxonomy_name.innerText = taxonomy.key().upperCaseFirstLetter();
-				//taxonomy_div.addChild(taxonomy_name);
+					taxonomy[1].sort(mlauto_sortByProbability);
 
-				//let term_list = mlauto_createTermList(taxonomy.values());
-				//taxonomy_div.addChild(term_list);
 
-				//container_div.addChild(taxonomy_div);
-			});
-		}
-		//If error
+					console.log(taxonomy[1]);
 
-			//Display error
 
-		//Put button back to normal
-		$button.width( $button.width() ).text('Classify Post');
+					//Create div
+					let taxonomy_div = document.createElement("div");
+					taxonomy_div.classList.add("mlauto_taxonomy_div");
+
+					//Inside div, create h3 with name of taxonomy
+					let taxonomy_name = document.createElement("h3");
+					//Capitilize taxonomy name
+					taxonomy_name.innerText = taxonomy[0].charAt(0).toUpperCase() + taxonomy[0].slice(1);
+					taxonomy_div.appendChild(taxonomy_name);
+
+					let term_list = mlauto_createTermList(taxonomy[1]);
+					taxonomy_div.appendChild(term_list);
+
+					container_div.appendChild(taxonomy_div);
+				});
+			}
+			//If error
+
+				//Display error
+
+			//Put button back to normal
+			$button.width( $button.width() ).text('Classify Post');
 
 	})
 	.fail(function(xhr, status, error) {

@@ -83,19 +83,16 @@ function MLAuto_classifyPost() {
 		$selected_terms[$taxonomy] = $term_names;
 	}
 
-		if ($post_id) {
-			$args["include"] = array($post_id);
-			$args["numberposts"] = 1;
-		}
- 
-		$all_posts = get_posts( $args );
+	if ($post_id) {
+		$args["include"] = array($post_id);
+		$args["numberposts"] = 1;
+	}
+
+	$all_posts = get_posts( $args );
 
 	//Vectorize post
 	$info = new PostInfoAggregator(array(), $args["MLAuto_specified_features"], $post_id);
 	$vectorizer = new Vectorizer($info->features);
-
-		//array($all_posts[0]->post_content, $all_posts[0]->post_title));
-
 
 
 	//Identify classifier
@@ -117,7 +114,7 @@ function MLAuto_classifyPost() {
 			$taxonomy_filenames = array_diff($taxonomy_filenames, [".", ".."]);
 
 			foreach ($taxonomy_filenames as $filename) {
-				$retval[$taxonomy_directory_name][$filename] = array();
+				$index = array_push($retval[$taxonomy_directory_name], array("name" => $filename)) -1;
 				
 				//Restore the saved classifier from file
 				$classifier = new Classifier();
@@ -125,22 +122,20 @@ function MLAuto_classifyPost() {
 				$file_path = MLAUTO_PLUGIN_URL . "bin/" . $classifier_folder_name . "/" . $taxonomy_directory_name . "/" . $filename;
 
 
+				//Finally, predict the probability
 				$classifier->restore($file_path);
-
-
-
 				$predicted_probability = $classifier->predictProbability($vectorizer->vectorized_samples);
 
 
 				//First arg in array is the predicted probability
-				array_push($retval[$taxonomy_directory_name][$filename] , $predicted_probability);
+				$retval[$taxonomy_directory_name][$index]["probabilities"] = $predicted_probability[0];
 
 				//Second argument in the array is a bool indicating if the term has already been selected for the post by the user
 				if (in_array($filename, $selected_terms[$taxonomy_directory_name])) {
-					array_push($retval[$taxonomy_directory_name][$filename] , true);
+					array_push($retval[$taxonomy_directory_name][$index]["checked"] = true);
 				}
 				else {
-					array_push($retval[$taxonomy_directory_name][$filename] , false);
+					array_push($retval[$taxonomy_directory_name][$index]["checked"] = false);
 				}
 
 			}
