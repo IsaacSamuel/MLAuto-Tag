@@ -28,8 +28,6 @@ use Phpml\CrossValidation\RandomSplit;
 
 
 
-define( 'MLAUTO_PLUGIN_URL', plugin_dir_path( __FILE__ ) );
-
 class MLAuto_Tag {
 
 	private function buildConfig() {

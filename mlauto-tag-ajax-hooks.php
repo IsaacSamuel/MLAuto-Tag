@@ -41,65 +41,113 @@ function MLAuto_saveSettings() {
 	wp_die();
 }
 
+function MLAuto_getTermSlugs($term) {
+	return $term->slug;
+}
+
 
 function MLAuto_classifyPost() {
 	$data = $_POST;
 
-	//$post = get_post($data->postID);
+	$post_id = intval($data["post_id"]);
 
-	//$args = MLAuto_Tag::getConfig();
+	$retval = array();
+
+
+	if (is_null($post_id)) {
+		wp_send_json_error("Did not recieve a valid input for parameter 'post_id. Recieved: " . $post_id);
+		wp_die();
+	}
+	else {
+		$post_id = intval($post_id);
+	}
+
+	$post = get_post($post_id);
+
+	if (is_null($post)) {
+		wp_send_json_error("Could not find post using post id: " . $post_id);
+		wp_die();
+	}
+
+	$args = MLAuto_Tag::getConfig();
 
 	//Get matching terms for post
-	//selected_terms = array()
-	//foreach($args["MLAuto_taxonomies"] as $taxonomy) {
-		//$terms = get_the_terms($data->postID, $taxonomy);
-		//term_names = array();
-		//if ($terms) {
-			//$term_names = $terms.reduce(PostInfoAggregator::cleanTerms($terms->name));
-		//}
-		//selected_terms->taxononmy = $term_names;
-	//}
+	$selected_terms = array();
+	foreach($args["MLAuto_taxonomies"] as $taxonomy) {
+		$terms = get_the_terms($post_id, $taxonomy);
+
+		$term_names = array();
+		if ($terms) {
+			$term_names = array_map('MLAuto_getTermSlugs', $terms);
+		}
+		$selected_terms[$taxonomy] = $term_names;
+	}
+
+		if ($post_id) {
+			$args["include"] = array($post_id);
+			$args["numberposts"] = 1;
+		}
+ 
+		$all_posts = get_posts( $args );
 
 	//Vectorize post
-	//$info = new PostInfoAggregator(array(), $args["MLAuto_specified_features"]);
-	//$vectorizer = new Vectorizer($info->features);
+	$info = new PostInfoAggregator(array(), $args["MLAuto_specified_features"], $post_id);
+	$vectorizer = new Vectorizer($info->features);
+
+		//array($all_posts[0]->post_content, $all_posts[0]->post_title));
 
 
-	try {
-		//Identify classifier
-		//TODO: Have a selected classifier
-		//For now, we just use the most recent
 
-		//Find bin directory
-		//For each file in bin directory
-			//get most recently created classifiers
+	//Identify classifier
+	//TODO: Have a selected classifier
+	//For now, we just use the most recent
+	$classifier_folder_name = end(scandir(MLAUTO_PLUGIN_URL . "bin"));
 
-		//For each taxonomy in classifiers
-			//$reval["taxonomy"] = array();
-			//For each file in category
+	$taxonomy_directory_names = scandir(MLAUTO_PLUGIN_URL . "bin/" . $classifier_folder_name);
 
-				//Load Classifier
-				//$retval->$filename = array();
+	$taxonomy_directory_names = array_diff($taxonomy_directory_names, [".", ".."]);
 
-				//First element of the array is the prediction
-				//$predicted_probability = classifier->predictProbability(vectorizer->features);
-				//$probabilty_feature_matches_post = $predicted_probability[0]
-				//array_push($retval->$filename, $probabilty_feature_matches_post);
+	foreach($taxonomy_directory_names as $taxonomy_directory_name) {
+		if ($taxonomy_directory_name !== "." && "taxonomy_directory_name" !== ".." ) {
+			$retval[$taxonomy_directory_name] = array();
+
+			//Get direcotroy object
+			$taxonomy_filenames = scandir(MLAUTO_PLUGIN_URL . "bin/" . $classifier_folder_name . "/" . $taxonomy_directory_name );
+
+			$taxonomy_filenames = array_diff($taxonomy_filenames, [".", ".."]);
+
+			foreach ($taxonomy_filenames as $filename) {
+				$retval[$taxonomy_directory_name][$filename] = array();
+				
+				//Restore the saved classifier from file
+				$classifier = new Classifier();
+
+				$file_path = MLAUTO_PLUGIN_URL . "bin/" . $classifier_folder_name . "/" . $taxonomy_directory_name . "/" . $filename;
+
+
+				$classifier->restore($file_path);
+
+
+
+				$predicted_probability = $classifier->predictProbability($vectorizer->vectorized_samples);
+
+
+				//First arg in array is the predicted probability
+				array_push($retval[$taxonomy_directory_name][$filename] , $predicted_probability);
 
 				//Second argument in the array is a bool indicating if the term has already been selected for the post by the user
-				//if (in_array($filename, $selected_terms->taxonomy) {
-					//array_push($retval->$filename, true);
-				//}
-				//else {
-					//array_push($retval->$filename, false);
-				//}
+				if (in_array($filename, $selected_terms[$taxonomy_directory_name])) {
+					array_push($retval[$taxonomy_directory_name][$filename] , true);
+				}
+				else {
+					array_push($retval[$taxonomy_directory_name][$filename] , false);
+				}
 
+			}
+		}
+	}
 
-	    wp_send_json_success($retval);
-	}
-	catch (Exception $e) {
-		wp_send_json_error('Caught exception: '. $e->getMessage() . "\n");
-	}
+	wp_send_json_success($retval);
 
 	wp_die();
 }

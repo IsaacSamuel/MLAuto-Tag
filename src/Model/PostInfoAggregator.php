@@ -55,14 +55,14 @@ class PostInfoAggregator {
 		$post_features = array();
 
 		foreach($feature_names as $feature_name) {
-			array_push($post_features, strtolower($post->feature_name));
+			array_push($post_features, strtolower($post->$feature_name));
 		}
 
 		array_push($this->features, $post_features);
 	}
 
 
-	private function extract_post_attributes(array $taxonomies, array $feature_names, int $postID): void {
+	private function extract_post_attributes(array $taxonomies, array $feature_names, int $post_id): void {
 		
 		$this->features = array();
 
@@ -73,8 +73,10 @@ class PostInfoAggregator {
 		  'numberposts' => -1
 		);
 
-		if ($postID) {
-			$args["post_id"] = $post_id;
+		//If we're only retrieving one post
+		if ($post_id) {
+			$args["include"] = array($post_id);
+			$args["numberposts"] = 1;
 		}
  
 		$all_posts = get_posts( $args );
@@ -133,14 +135,14 @@ class PostInfoAggregator {
 
 	}
 
-	public function __construct(array $taxonomies, array $specified_features, int $postID) {
+	public function __construct(array $taxonomies, array $specified_features, int $post_id) {
 
 		//If we're only classifying an individual post, we don't need to extract any targets; the classifier already exists and has been trained for the targets.
 		if (count($taxonomies) != 0) {
 			$this->extract_targets_collection($taxonomies);
 		}
 
-		$this->extract_post_attributes($taxonomies, $specified_features, $postID);
+		$this->extract_post_attributes($taxonomies, $specified_features, $post_id);
 	}
 
 }
