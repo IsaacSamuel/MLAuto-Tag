@@ -134,6 +134,36 @@ class MLAuto_Tag {
     }
 */
 
+    public function mlauto_metabox_save_meta( $post_id ) {
+
+    	$data = $_POST;
+
+    	$post = get_post($post_id);
+
+    	$args = $this->getConfig();
+
+    	$taxonomies = $args["MLAuto_taxonomies"];
+
+    	foreach($taxonomies as $taxonomy) {
+    		//get all terms
+    		$all_terms = get_terms(array('taxonomy' => $taxonomy));
+
+    		foreach($all_terms as $term) {
+    			//This is the id we used on the form
+    			$id_name = $taxonomy . "||" . $term->slug;
+
+    			//If it is checked on the form, associate the term with the post
+    			if (isset($data[$id_name])){
+    				wp_set_post_terms($post_id, $term->term_id, $taxonomy, true );
+    			}
+    			//If it's not checked on the form, unassociate the term with the post
+    			else {
+    				wp_remove_object_terms($post_id, $term->term_id, $taxonomy);
+    			}
+    		}
+    	}
+    }
+
 
     public function displayPluginMetaBox() {
     	require_once 'partials/mlauto-meta-box.php';
@@ -192,6 +222,7 @@ class MLAuto_Tag {
 		add_action('admin_menu', array( $this, 'addPluginAdminMenu' )); 
 		add_action('add_meta_boxes', array($this, 'addPluginMetaBox') );
 
+		add_action('save_post', array($this, 'mlauto_metabox_save_meta'));
 	}
 
 }

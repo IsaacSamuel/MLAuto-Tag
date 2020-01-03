@@ -41,6 +41,7 @@ function MLAuto_saveSettings() {
 	wp_die();
 }
 
+
 function MLAuto_getTermSlugs($term) {
 	return $term->slug;
 }
