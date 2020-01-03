@@ -132,10 +132,10 @@ function MLAuto_classifyPost() {
 
 				//Second argument in the array is a bool indicating if the term has already been selected for the post by the user
 				if (in_array($filename, $selected_terms[$taxonomy_directory_name])) {
-					array_push($retval[$taxonomy_directory_name][$index]["checked"] = true);
+					$retval[$taxonomy_directory_name][$index]["checked"] = true;
 				}
 				else {
-					array_push($retval[$taxonomy_directory_name][$index]["checked"] = false);
+					$retval[$taxonomy_directory_name][$index]["checked"] = false;
 				}
 
 			}

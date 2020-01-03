@@ -48,6 +48,8 @@ class MLAuto_Tag {
 
 
     public function enqueueAdminScripts() {
+		wp_enqueue_style( 'mlauto-admin-style', plugins_url('static/css/style.css', __FILE__));
+
    		wp_enqueue_script( 'jquery');
     	wp_enqueue_script( 'mlauto-settings', plugins_url('static/js/settings.js', __FILE__), array ( 'jquery' ), 1.1, true);
     	wp_enqueue_script( 'mlauto-classify-post', plugins_url('static/js/classify_post.js', __FILE__), array ( 'jquery' ), 1.1, true);
