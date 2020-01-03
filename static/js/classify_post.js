@@ -35,6 +35,10 @@ function mlauto_createTermList(terms) {
 		term_item.appendChild(checkbox);
 		term_item.appendChild(label);
 
+		if(term["probabilities"]["0"] > .97) {
+			term_item.style.display = "none";
+		}
+
 		term_list.appendChild(term_item);
 	})
 
@@ -77,14 +81,11 @@ jQuery( "#classify_post" ).on("click", function( event ) {
 				success : true / false
 				data :
 					{
-						[Taxonomy Name : Predictions]
+						[Taxonomy Name : Term Data]
 						"category" :
-							{
-								[Term: [Prediction, Already checked]]
-								"Advocacy" : [97%, true]
-								"Legal" : [85%, false]
-								...
-							}
+							[
+								[Term Data]
+							]
 						...
 					}
 			]
