@@ -1,4 +1,4 @@
-function mlauto_createTermList(terms) {
+function mlauto_createTermList(terms, taxonomy_name) {
 
 	/*
 		[
@@ -22,7 +22,7 @@ function mlauto_createTermList(terms) {
 		let term_name = term["name"]
 		checkbox.setAttribute("type", "checkbox");
 		checkbox.setAttribute("id", term_name);
-		checkbox.setAttribute("name", term_name);
+		checkbox.setAttribute("name", taxonomy_name + "||" + term_name);
 		checkbox.setAttribute("value", term_name);
 		//If the term is already selected, display it as checked
 		checkbox.checked = term["checked"];
@@ -103,13 +103,10 @@ jQuery( "#classify_post" ).on("click", function( event ) {
 
 					taxonomy[1].sort(mlauto_sortByProbability);
 
-
-					console.log(taxonomy[1]);
-
-
 					//Create div
 					let taxonomy_div = document.createElement("div");
 					taxonomy_div.classList.add("mlauto_taxonomy_div");
+					taxonomy_div.setAttribute("id", taxonomy[0]);
 
 					//Inside div, create h3 with name of taxonomy
 					let taxonomy_name = document.createElement("h3");
@@ -117,7 +114,10 @@ jQuery( "#classify_post" ).on("click", function( event ) {
 					taxonomy_name.innerText = taxonomy[0].charAt(0).toUpperCase() + taxonomy[0].slice(1);
 					taxonomy_div.appendChild(taxonomy_name);
 
-					let term_list = mlauto_createTermList(taxonomy[1]);
+					//Create form with taxonomy name
+
+
+					let term_list = mlauto_createTermList(taxonomy[1], taxonomy[0]);
 					taxonomy_div.appendChild(term_list);
 
 					container_div.appendChild(taxonomy_div);
