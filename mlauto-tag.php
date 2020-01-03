@@ -214,6 +214,8 @@ class MLAuto_Tag {
 
 		$this->init();
 
+		new MLAuto_Tag_Ajax_Hooks();
+
 		//$this->testClassifier();
 
 		//Add actions and hooks
@@ -226,8 +228,6 @@ class MLAuto_Tag {
 	}
 
 }
-
-//add_action('init', array(__CLASS__, 'main'));
 
 new MLAuto_Tag();
 
