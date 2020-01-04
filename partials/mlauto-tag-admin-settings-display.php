@@ -85,19 +85,19 @@ $test_percentage = $currentConfiguration["MLAuto_test_percentage"];
 	        	<label for="MLAuto_gamma"><strong>Gamma</strong> (Default: 0, meaning (1/features)</label>
 	        	<br>
 
-	        	<input type="text" id="MLAuto_cost" name="MLAuto_cost" value=<?php echo $cost ?>>
+	        	<input type="number" step=".25" id="MLAuto_cost" name="MLAuto_cost" value=<?php echo $cost ?>>
 	        	<label for="MLAuto_cost"><strong>Cost</strong> (Default: 1.0)</label>
 	        	<br>
 
-	        	<input type="number" id="MLAuto_tolerance" name="MLAuto_tolerance" value=<?php echo $tolerance ?>>
+	        	<input type="number" id="MLAuto_tolerance" step=".0005" name="MLAuto_tolerance" value=<?php echo $tolerance ?>>
 	        	<label for="MLAuto_tolerance"><strong>Tolerance</strong> (Default: .001)</label>
 
 	        	<br>
-	        	<input type="text" id="MLAuto_test_percentage" name="MLAuto_test_percentage" value=<?php echo $test_percentage ?>>
+	        	<input type="number" step=".025" id="MLAuto_test_percentage" name="MLAuto_test_percentage" value=<?php echo $test_percentage ?>>
 	        	<label for="MLAuto_test_percentage"><strong>Test Percentage Size</strong> (Default: .2 (20%))</label>
 	        </div>
 	        <?php 
-	            echo "<p><a href='#' id='save_settings' class='mlauto_button button button-primary'>Save Settings</a></p>";
+	            echo "<p><a href='#' id='save_settings' class='disabled mlauto_button button button-primary'>Save Settings</a></p>";
 	            
 				echo "<p><a href='#' id='generate_classifier' class='mlauto_button button button-primary'>Generate Classifier</a></p>";
             ?>  
