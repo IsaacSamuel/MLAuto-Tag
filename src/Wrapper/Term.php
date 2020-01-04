@@ -58,7 +58,6 @@ class Term {
 		}
 	}
 
-
 	public function loadClassifier($path) {
 		//Restore the saved classifier from file
 		$classifier = new Classifier();

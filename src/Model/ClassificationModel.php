@@ -7,7 +7,7 @@ namespace mlauto\Model;
 use mlauto\Wrapper\Term;
 
 
-class Classification {
+class ClassificationModel {
 
 	public static function intializeTable() {
 
@@ -19,28 +19,26 @@ class Classification {
 		if(!$wpdb->get_var("SHOW TABLES LIKE '$table_name'") == $table_name) {	
 
 			$sql = "CREATE TABLE $table_name (
-				  id mediumint(9) NOT NULL AUTO_INCREMENT,
-				  created_at datetime NOT NULL,
-				  custom_name tinytext NOT NULL,
-				  taxonomy_name tinytext NOT NULL,
-				  tag_name tinytext NOT NULL,
-				  location_of_serialized_object tinytext NOT NULL,
-				  accuracy float,
-				  gamma float,
-				  cost float,
-				  tolerance float,
-				  training_percentage float,
-				  specified_features TEXT,
-				  PRIMARY KEY  (id)
-				) $charset_collate;";
+							  id mediumint(9) NOT NULL AUTO_INCREMENT,
+							  created_at datetime NOT NULL,
+							  custom_name tinytext NOT NULL,
+							  classifier_directory tinytext NOT NULL,
+							  active bool,
+							  gamma float,
+							  cost float,
+							  tolerance float,
+							  training_percentage float,
+							  specified_features TEXT,
+							  PRIMARY KEY  (id)
+							) $charset_collate;";
 
 			require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
 			dbDelta( $sql );
 		}
-
 	}
 
-	public static function saveClassification(Term &$term, array $args) {
+
+	public static function saveClassification(array $args) {
 		global $wpdb;
 
 		$specified_features = maybe_serialize($args["MLAuto_specified_features"]);
@@ -50,13 +48,8 @@ class Classification {
 		$training_percentage = $args["MLAuto_test_percentage"];
 		$custom_name = $args["MLAuto_classifier_name"];
 
-
-		//Save Classification to file
-		$dir_of_serialized_object = 'bin/' . $custom_name . '/'.  $term->taxonomy . '/';
-		$create_dir = mkdir( MLAUTO_PLUGIN_URL . $dir_of_serialized_object, 0777, true);
-
-		$term->setPath(MLAUTO_PLUGIN_URL . "bin/" . $custom_name);
-		$term->saveToFile();
+		$classifier_directory = 'bin/' . $custom_name . '/';
+		mkdir( MLAUTO_PLUGIN_URL . $dir_of_serialized_object, 0777, true);
 
 
 		//Save Classification to DB
@@ -67,14 +60,12 @@ class Classification {
 			array( 
 				'created_at' => current_time( 'mysql' ), 
 				'custom_name' => $custom_name,
-				'taxonomy_name' => $term->taxonomy,
-				'accuracy' => $term->getAccuracy(),
 				'gamma' => $gamma,
 				'tolerance' => $tolerance,
-				'tag_name' => $term->name,
 				'cost' => $cost,
+				'active' => $true,
 				'training_percentage' => $training_percentage,
-				'location_of_serialized_object' => $dir_of_serialized_object . $term->name,
+				'classifier_directory' => $directory_location,
 				'specified_features' => $specified_features,
 			) 
 		);

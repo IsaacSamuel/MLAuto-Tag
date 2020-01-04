@@ -1,7 +1,9 @@
 <?php
 
 use mlauto\Model\PostInfoAggregator;
-use mlauto\Model\Classification;
+use mlauto\Model\ClassificationModelModel;
+use mlauto\Model\TermModel;
+
 
 use mlauto\Analysis\Vectorizer;
 use mlauto\Analysis\Classifier;
@@ -90,7 +92,7 @@ class MLAuto_Tag_Ajax_Hooks {
 		//Identify classifier
 		//TODO: Have a selected classifier
 		//For now, we just use the most recent
-		$classifications = Classification::getClassifications(null);
+		$classifications = ClassificationModel::getClassifications(null);
 
 		foreach($classifications as $classification) {
 			if (!isset($retval[$classification->taxonomy_name])) {
@@ -165,7 +167,7 @@ class MLAuto_Tag_Ajax_Hooks {
 				$term->setClassifier($classifier);
 				$term->setAccuracy(Accuracy::score($test_labels, $predictedLabels, true));
 
-				Classification::saveClassification($term, $args);
+				ClassificationModel::saveClassificationModel($term, $args);
 
 			}
 

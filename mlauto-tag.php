@@ -13,7 +13,9 @@ declare(strict_types=1);
 require 'class_loader.php';
 
 use mlauto\Model\PostInfoAggregator;
-use mlauto\Model\Classification;
+use mlauto\Model\ClassificationModel;
+use mlauto\Model\TermModel;
+
 
 use mlauto\Analysis\Vectorizer;
 use mlauto\Analysis\Classifier;
@@ -123,7 +125,7 @@ class MLAuto_Tag {
 				$args["tag_name"] = $target;
 				$args["training_percentage"] = .75;
 
-				Classification::saveClassification($classifier, $args);
+				ClassificationModel::saveClassificationModel($classifier, $args);
 
 			}
 
@@ -209,7 +211,8 @@ class MLAuto_Tag {
 		$this->buildConfig();
 
 		//If SQL Table isn't initiated, initiate it
-		Classification::intializeTable();
+		ClassificationModel::intializeTable();
+		TermModel::intializeTable();
 	}
 
 	public function __construct() {

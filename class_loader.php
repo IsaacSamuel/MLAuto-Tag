@@ -4,7 +4,9 @@ define( 'MLAUTO_PLUGIN_URL', plugin_dir_path( __FILE__ ) );
 
 
 require_once 'src/Model/PostInfoAggregator.php';
-require_once 'src/Model/Classification.php';
+require_once 'src/Model/ClassificationModel.php';
+require_once 'src/Model/TermModel.php';
+
 
 require_once "src/Wrapper/Term.php";
 
