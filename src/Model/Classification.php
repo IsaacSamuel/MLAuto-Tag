@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace mlauto\Model;
 
+use mlauto\Wrapper\Term;
+
 
 class Classification {
 
@@ -82,6 +84,77 @@ class Classification {
 			) 
 		);
 	}
+
+	public static function getClassifierTerms($classifier_name) {
+		/* Folder setup:
+			.bin/
+				classifier1/ (name will be user-defined or timestamp by default)
+					taxonomy1/
+						term1 (classifier binary file)
+					    term2 (classifier binary file)
+					    .... (more terms)
+
+					taxonomy2/
+					... (more taxonomies)
+
+				classifier2/
+					... 
+				...(more classifier names)
+		*/
+
+
+		/*Retval format 
+			{
+				"taxonomy1"
+					{
+						"term1" : filepath
+						"term2" : filepath
+						...
+					}
+				"taxonomy2"
+					{...}
+				...
+			}
+
+		*/
+
+		$classifier_terms = array();
+
+		//By default, we just select the most recent classifier
+		if (!isset($classifier_name)) {
+			$classifier_name = end(scandir(MLAUTO_PLUGIN_URL . "bin"));
+		}
+
+		//Get the names of the taxonomy directories
+		$taxonomy_directory_names = scandir(MLAUTO_PLUGIN_URL . "bin/" . $classifier_name);
+
+		//remove the filenames that represtent current and parent directory
+		$taxonomy_directory_names = array_diff($taxonomy_directory_names, [".", ".."]);
+
+
+		foreach($taxonomy_directory_names as $taxonomy_directory_name) {
+
+			$taxonomy_filenames = scandir(MLAUTO_PLUGIN_URL . "bin/" . $classifier_name . "/" . $taxonomy_directory_name );
+
+			$taxonomy_filenames = array_diff($taxonomy_filenames, [".", ".."]);
+
+			foreach ($taxonomy_filenames as $filename) {
+
+				$term = new Term($filename, $taxonomy_directory_name);
+
+				$term->setPath(MLAUTO_PLUGIN_URL . "bin/" . $classifier_name);
+
+				array_push($classifier_terms, $term);
+
+				//$directory_paths[$taxonomy_directory_name][$filename] = MLAUTO_PLUGIN_URL . "bin/" . $classifier_folder_name . "/" . $taxonomy_directory_name . '/'. $filename;
+
+			}
+	
+		}
+
+		return $classifier_terms;
+	}
+
 
 	public function deleteClassification(int $id) {
 		global $wpdb;

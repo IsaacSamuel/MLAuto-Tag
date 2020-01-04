@@ -6,6 +6,8 @@ use mlauto\Model\Classification;
 use mlauto\Analysis\Vectorizer;
 use mlauto\Analysis\Classifier;
 
+use mlauto\Wrapper\Term;
+
 
 use Phpml\Metric\Accuracy;
 use Phpml\Metric\ClassificationReport;
@@ -54,7 +56,7 @@ class MLAuto_Tag_Ajax_Hooks {
 
 		$retval = array();
 
-
+/*
 		if (is_null($post_id)) {
 			wp_send_json_error("Did not recieve a valid input for parameter 'post_id. Recieved: " . $post_id);
 			wp_die();
@@ -62,18 +64,43 @@ class MLAuto_Tag_Ajax_Hooks {
 		else {
 			$post_id = intval($post_id);
 		}
+*/
 
 		$post = get_post($post_id);
-
+/*
 		if (is_null($post)) {
 			wp_send_json_error("Could not find post using post id: " . $post_id);
 			wp_die();
 		}
+*/
+
+		//$post = new Post($post_id);
+
+		//$retval = array();
+
+		//$vectorized_samples = $post->getVectorizedSamples($args["MLAuto_specified_features"]);
+		//$classifier = new ClassifierModel($args["MLAuto_selected_classifier"], $post);
+		//$taxonomies = $classifier.getTaxonomies();
+		//$foreach taxonomy in taxonomies()
+			//retval[taxonomy] = array();
+			//foreach term in taxonomy.getTerms()
+				//term.predictProbability($vectorized_samples);
+				//is_selected = $post->isSelected($term.getSlug());
+
+				//array_push(retval[taxonomy], array(
+					//name : term.name
+					//probability : term.probability
+					//selected : is_selected
+				//))
+
+		//return retval
+
 
 		$args = MLAuto_Tag::getConfig();
 
-		//Get matching terms for post
-		$selected_terms = array();
+		$retval = array();
+
+		//Get existing taxonomies for this post
 		foreach($args["MLAuto_taxonomies"] as $taxonomy) {
 			$terms = get_the_terms($post_id, $taxonomy);
 
@@ -84,12 +111,6 @@ class MLAuto_Tag_Ajax_Hooks {
 			$selected_terms[$taxonomy] = $term_names;
 		}
 
-		if ($post_id) {
-			$args["include"] = array($post_id);
-			$args["numberposts"] = 1;
-		}
-
-		$all_posts = get_posts( $args );
 
 		//Vectorize post
 		$info = new PostInfoAggregator(array(), $args["MLAuto_specified_features"], $post_id);
@@ -99,50 +120,32 @@ class MLAuto_Tag_Ajax_Hooks {
 		//Identify classifier
 		//TODO: Have a selected classifier
 		//For now, we just use the most recent
-		$classifier_folder_name = end(scandir(MLAUTO_PLUGIN_URL . "bin"));
+		$classifier_terms = Classification::getClassifierTerms(null);
 
-		$taxonomy_directory_names = scandir(MLAUTO_PLUGIN_URL . "bin/" . $classifier_folder_name);
-
-		$taxonomy_directory_names = array_diff($taxonomy_directory_names, [".", ".."]);
-
-		foreach($taxonomy_directory_names as $taxonomy_directory_name) {
-			if ($taxonomy_directory_name !== "." && "taxonomy_directory_name" !== ".." ) {
-				$retval[$taxonomy_directory_name] = array();
-
-				//Get direcotroy object
-				$taxonomy_filenames = scandir(MLAUTO_PLUGIN_URL . "bin/" . $classifier_folder_name . "/" . $taxonomy_directory_name );
-
-				$taxonomy_filenames = array_diff($taxonomy_filenames, [".", ".."]);
-
-				foreach ($taxonomy_filenames as $filename) {
-					$index = array_push($retval[$taxonomy_directory_name], array("name" => $filename)) -1;
-					
-					//Restore the saved classifier from file
-					$classifier = new Classifier();
-
-					$file_path = MLAUTO_PLUGIN_URL . "bin/" . $classifier_folder_name . "/" . $taxonomy_directory_name . "/" . $filename;
-
-
-					//Finally, predict the probability
-					$classifier->restore($file_path);
-					$predicted_probability = $classifier->predictProbability($vectorizer->vectorized_samples);
-
-
-					//First arg in array is the predicted probability
-					$retval[$taxonomy_directory_name][$index]["probabilities"] = $predicted_probability[0];
-
-					//Second argument in the array is a bool indicating if the term has already been selected for the post by the user
-					if (in_array($filename, $selected_terms[$taxonomy_directory_name])) {
-						$retval[$taxonomy_directory_name][$index]["checked"] = true;
-					}
-					else {
-						$retval[$taxonomy_directory_name][$index]["checked"] = false;
-					}
-
-				}
+		foreach ($classifier_terms as $term) {
+			if (!isset($retval[$term->taxonomy])) {
+				$retval[$term->taxonomy] = array();
 			}
+
+			//Restore the saved classifier from file
+			$classifier = new Classifier();
+			$classifier->restore($term->getPath());
+
+
+			//Finally, predict the probability
+			$predicted_probability = $classifier->predictProbability($vectorizer->vectorized_samples);
+
+			array_push($retval[$term->taxonomy], array(
+				"name" => $term->slug,
+				"probabilities" => $predicted_probability[0],
+				"checked" => in_array($term->slug, $selected_terms[$term->taxonomy])
+			));
+
+
+
 		}
 
+		
 		wp_send_json_success($retval);
 
 		wp_die();
@@ -160,6 +163,10 @@ class MLAuto_Tag_Ajax_Hooks {
 		$info = new PostInfoAggregator($taxonomies, $args["MLAuto_specified_features"], 0);
 
 		$vectorizer = new Vectorizer($info->features);
+
+		//$classifier = new ClassifierModel(args["Classifier_name"]);
+
+		//classifier
 
 		$args["custom_name"] = current_time( 'timestamp' );
 
