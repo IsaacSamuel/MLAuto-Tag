@@ -5,6 +5,8 @@ declare(strict_types=1);
 
 namespace mlauto\Wrapper;
 
+use mlauto\Analysis\Classifier;
+
 
 class Term {
 	public $name;
@@ -12,6 +14,8 @@ class Term {
 
 	private $path;
 	private $accuracy;
+	private $classifier;
+
 
 	public function setPath(String $classifierPath) {
 		$this->path = $classifierPath . "/" . $this->taxonomy . "/" . $this->name;
@@ -20,6 +24,17 @@ class Term {
 	public function getPath() {
 		if (isset($this->path)) {
 			return $this->path;
+		}
+		return false;
+	}
+
+	public function setClassifier(Classifier &$classifier) {
+		$this->classifier = $classifier;
+	}
+
+	public function getClassifier() {
+		if (isset($this->classifier)) {
+			return $this->$classifier;
 		}
 		return false;
 	}
@@ -34,6 +49,13 @@ class Term {
 			return $this->accuracy;
 		}
 		return $this->accuracy;
+	}
+
+
+	public function saveToFile(){
+		if (isset($this->classifier)) {
+			$this->classifier->saveToFile($this->path);
+		}
 	}
 
 

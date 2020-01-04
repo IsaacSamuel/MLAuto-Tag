@@ -40,7 +40,7 @@ class Classification {
 
 	}
 
-	public static function saveClassification(object &$classifier, Term $term, array $args, $custom_name) {
+	public static function saveClassification(Term &$term, array $args, $custom_name) {
 		global $wpdb;
 
 		$specified_features = maybe_serialize($args["MLAuto_specified_features"]);
@@ -56,7 +56,7 @@ class Classification {
 
 
 		$term->setPath(MLAUTO_PLUGIN_URL . "bin/" . $custom_name);
-		$classifier->saveToFile($term->getPath());
+		$term->saveToFile();
 
 
 		$table_name = $wpdb->prefix . 'MLAutoTag_Classifications';

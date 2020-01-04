@@ -183,9 +183,10 @@ class MLAuto_Tag_Ajax_Hooks {
 
 
 				$term = new Term($target, $taxonomies[$i]);
+				$term->setClassifier($classifier);
 				$term->setAccuracy(Accuracy::score($test_labels, $predictedLabels, true));
 
-				Classification::saveClassification($classifier, $term, $args, $custom_name);
+				Classification::saveClassification($term, $args, $custom_name);
 
 			}
 
