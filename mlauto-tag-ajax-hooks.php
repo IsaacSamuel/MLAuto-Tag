@@ -58,32 +58,7 @@ class MLAuto_Tag_Ajax_Hooks {
 
 		$post = get_post($post_id);
 
-
-		//$post = new Post($post_id);
-
-		//$retval = array();
-
-		//$vectorized_samples = $post->getVectorizedSamples($args["MLAuto_specified_features"]);
-		//$classifier = new ClassifierModel($args["MLAuto_selected_classifier"], $post);
-		//$taxonomies = $classifier.getTaxonomies();
-		//$foreach taxonomy in taxonomies()
-			//retval[taxonomy] = array();
-			//foreach term in taxonomy.getTerms()
-				//term.predictProbability($vectorized_samples);
-				//is_selected = $post->isSelected($term.getSlug());
-
-				//array_push(retval[taxonomy], array(
-					//name : term.name
-					//probability : term.probability
-					//selected : is_selected
-				//))
-
-		//return retval
-
-
 		$args = MLAuto_Tag::getConfig();
-
-		$retval = array();
 
 		//Get existing taxonomies for this post
 		foreach($args["MLAuto_taxonomies"] as $taxonomy) {
@@ -105,29 +80,25 @@ class MLAuto_Tag_Ajax_Hooks {
 		//Identify classifier
 		//TODO: Have a selected classifier
 		//For now, we just use the most recent
-		$classifier_terms = Classification::getClassifierTerms(null);
+		$classifications = Classification::getClassifications(null);
 
-		foreach ($classifier_terms as $term) {
-			if (!isset($retval[$term->taxonomy])) {
-				$retval[$term->taxonomy] = array();
+		foreach($classifications as $classification) {
+			if (!isset($retval[$classification->taxonomy_name])) {
+				$retval[$classification->taxonomy_name] = array();
 			}
 
-			//Restore the saved classifier from file
-			$classifier = new Classifier();
-			$classifier->restore($term->getPath());
+			$term = new Term($classification->tag_name, $classification->taxonomy_name);
 
+			$term->loadClassifier(MLAUTO_PLUGIN_URL . $classification->location_of_serialized_object);
 
-			//Finally, predict the probability
-			$predicted_probability = $classifier->predictProbability($vectorizer->vectorized_samples);
+			$term->predictProbability($vectorizer->vectorized_samples);
 
-			array_push($retval[$term->taxonomy], array(
+			array_push($retval[$classification->taxonomy_name], array(
 				"name" => $term->name,
-				"probabilities" => $predicted_probability[0],
-				"checked" => in_array($term->name, $selected_terms[$term->taxonomy])
+				"probabilities" => $term->predicted_probability,
+				"checked" => in_array($term->name, $selected_terms[$classification->taxonomy_name])
 			));
-
-		}
-
+		} 
 		
 		wp_send_json_success($retval);
 

@@ -11,6 +11,7 @@ use mlauto\Analysis\Classifier;
 class Term {
 	public $name;
 	public $taxonomy;
+	public $predicted_probability;
 
 	private $path;
 	private $accuracy;
@@ -39,7 +40,6 @@ class Term {
 		return false;
 	}
 
-
 	public function setAccuracy(float $accuracy) {
 		$this->accuracy = $accuracy;
 	}
@@ -56,6 +56,19 @@ class Term {
 		if (isset($this->classifier)) {
 			$this->classifier->saveToFile($this->path);
 		}
+	}
+
+
+	public function loadClassifier($path) {
+		//Restore the saved classifier from file
+		$classifier = new Classifier();
+		$classifier->restore($path);
+
+		$this->classifier = $classifier;
+	}
+
+	public function predictProbability(&$vectorized_samples) {
+		$this->predicted_probability = $this->classifier->predictProbability($vectorized_samples)[0];
 	}
 
 
