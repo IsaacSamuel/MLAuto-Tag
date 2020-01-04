@@ -7,3 +7,46 @@
 	display: flex;
 	flex-wrap: wrap;
 }
+
+
+/*Settings page*/
+
+#mlauto_save_settings_form {
+	display : flex;
+	flex-wrap: wrap;
+
+	margin: 2%;
+	padding: 2%;
+	background-color: #cccccc;
+	border-radius: 5px;
+}
+
+#mlauto_save_settings_form > div {
+	width: 45%;
+	margin-right: 4%;
+	margin-bottom: 2em;
+}
+
+
+.mlauto_checkbox {
+	display: flex;
+	flex-wrap: wrap;
+}
+
+.mlauto_checkbox > label {
+	margin-right: 10px;
+}
+
+.mlauto_button {
+	margin-right: 10px !important;
+}
+
+@media screen and (max-width: 500px) {
+  .mlauto_save_settings_form {
+    flex-direction: column;
+  }
+
+  #mlauto_save_settings_form > div {
+  	width: 100%;
+  }
+}
