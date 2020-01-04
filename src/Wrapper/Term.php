@@ -8,10 +8,14 @@ namespace mlauto\Wrapper;
 
 class Term {
 	public $name;
-	public $slug;
 	public $taxonomy;
 
 	private $path;
+	private $accuracy;
+
+	public function setPath(String $classifierPath) {
+		$this->path = $classifierPath . "/" . $this->taxonomy . "/" . $this->name;
+	}
 
 	public function getPath() {
 		if (isset($this->path)) {
@@ -20,13 +24,22 @@ class Term {
 		return false;
 	}
 
-	public function setPath(String $classifierPath) {
-		$this->path = $classifierPath . "/" . $this->taxonomy . "/" . $this->slug;
+
+	public function setAccuracy(float $accuracy) {
+		$this->accuracy = $accuracy;
 	}
 
-	public function __construct($slug, $taxonomyName) {
+	public function getAccuracy() {
+		if (isset($this->accuracy)) {
+			return $this->accuracy;
+		}
+		return $this->accuracy;
+	}
+
+
+	public function __construct($name, $taxonomyName) {
 		$this->taxonomy = $taxonomyName;
-		$this->slug = $slug;
+		$this->name = $name;
 	}
 	
 }

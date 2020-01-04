@@ -70,14 +70,18 @@ jQuery( "#generate_classifier" ).on("click", function( event ) {
     var data = {"action" : "generateClassifier"};
 
 
-	jQuery.post( MLAuto_Ajax_Settings.ajaxurl, data, function( response ) {
+	jQuery.post( MLAuto_Ajax_Settings.ajaxurl, data)
+		.done( function(response ) {
 
-        console.log(response);
+	        console.log(response);
 
-        $button.width( $button.width() ).text('Generate Classifier');
+	        $button.width( $button.width() ).text('Generate Classifier');
+	    })
 
+		.fail(function(xhr, status, error) {
+			console.log(xhr.responseText);
 
-    } );
-
-})
+			$button.width( $button.width() ).text('Classify Post');
+	    });
+});
 

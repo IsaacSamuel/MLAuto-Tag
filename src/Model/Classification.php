@@ -40,29 +40,23 @@ class Classification {
 
 	}
 
-	public static function saveClassification(object &$classifier, array $args) {
+	public static function saveClassification(object &$classifier, Term $term, array $args, $custom_name) {
 		global $wpdb;
 
-		$tag_name = $args["tag_name"];
-		$taxonomy_name = $args["taxonomy_name"];
 		$specified_features = maybe_serialize($args["MLAuto_specified_features"]);
-		$accuracy = $args["accuracy"];
 		$gamma = $args["MLAuto_gamma"];
 		$tolerance = $args["MLAuto_tolerance"];
 		$cost = $args["MLAuto_cost"];
 		$training_percentage = $args["MLAuto_test_percentage"];
 
-		$custom_name = $args["custom_name"];
 
-		$dir_of_serialized_object = 'bin/' . $custom_name . '/'.  $taxonomy_name . '/';
+		$dir_of_serialized_object = 'bin/' . $custom_name . '/'.  $term->taxonomy . '/';
 
 		$create_dir = mkdir( MLAUTO_PLUGIN_URL . $dir_of_serialized_object, 0777, true);
 
 
-		$location_of_serialized_object = $dir_of_serialized_object . trim($tag_name);
-
-
-		$classifier->saveToFile(MLAUTO_PLUGIN_URL . $location_of_serialized_object);
+		$term->setPath(MLAUTO_PLUGIN_URL . "bin/" . $custom_name);
+		$classifier->saveToFile($term->getPath());
 
 
 		$table_name = $wpdb->prefix . 'MLAutoTag_Classifications';
@@ -72,37 +66,20 @@ class Classification {
 			array( 
 				'created_at' => current_time( 'timestamp' ), 
 				'custom_name' => $custom_name,
-				'taxonomy_name' => $taxonomy_name,
-				'accuracy' => $accuracy,
+				'taxonomy_name' => $term->taxonomy,
+				'accuracy' => $term->getAccuracy(),
 				'gamma' => $gamma,
 				'tolerance' => $tolerance,
-				'tag_name' => $tag_name,
+				'tag_name' => $term->name,
 				'cost' => $cost,
 				'training_percentage' => $training_percentage,
-				'location_of_serialized_object' => $location_of_serialized_object,
+				'location_of_serialized_object' => $term->getPath(),
 				'specified_features' => $specified_features,
 			) 
 		);
 	}
 
 	public static function getClassifierTerms($classifier_name) {
-		/* Folder setup:
-			.bin/
-				classifier1/ (name will be user-defined or timestamp by default)
-					taxonomy1/
-						term1 (classifier binary file)
-					    term2 (classifier binary file)
-					    .... (more terms)
-
-					taxonomy2/
-					... (more taxonomies)
-
-				classifier2/
-					... 
-				...(more classifier names)
-		*/
-
-
 		/*Retval format 
 			{
 				"taxonomy1"
@@ -145,8 +122,6 @@ class Classification {
 				$term->setPath(MLAUTO_PLUGIN_URL . "bin/" . $classifier_name);
 
 				array_push($classifier_terms, $term);
-
-				//$directory_paths[$taxonomy_directory_name][$filename] = MLAUTO_PLUGIN_URL . "bin/" . $classifier_folder_name . "/" . $taxonomy_directory_name . '/'. $filename;
 
 			}
 	

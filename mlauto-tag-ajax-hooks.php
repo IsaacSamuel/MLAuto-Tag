@@ -56,23 +56,8 @@ class MLAuto_Tag_Ajax_Hooks {
 
 		$retval = array();
 
-/*
-		if (is_null($post_id)) {
-			wp_send_json_error("Did not recieve a valid input for parameter 'post_id. Recieved: " . $post_id);
-			wp_die();
-		}
-		else {
-			$post_id = intval($post_id);
-		}
-*/
-
 		$post = get_post($post_id);
-/*
-		if (is_null($post)) {
-			wp_send_json_error("Could not find post using post id: " . $post_id);
-			wp_die();
-		}
-*/
+
 
 		//$post = new Post($post_id);
 
@@ -136,12 +121,10 @@ class MLAuto_Tag_Ajax_Hooks {
 			$predicted_probability = $classifier->predictProbability($vectorizer->vectorized_samples);
 
 			array_push($retval[$term->taxonomy], array(
-				"name" => $term->slug,
+				"name" => $term->name,
 				"probabilities" => $predicted_probability[0],
-				"checked" => in_array($term->slug, $selected_terms[$term->taxonomy])
+				"checked" => in_array($term->name, $selected_terms[$term->taxonomy])
 			));
-
-
 
 		}
 
@@ -164,11 +147,8 @@ class MLAuto_Tag_Ajax_Hooks {
 
 		$vectorizer = new Vectorizer($info->features);
 
-		//$classifier = new ClassifierModel(args["Classifier_name"]);
+		$custom_name =  current_time('timestamp');
 
-		//classifier
-
-		$args["custom_name"] = current_time( 'timestamp' );
 
 				
 		for ($i=0; $i < count($taxonomies); $i++) { 
@@ -201,11 +181,11 @@ class MLAuto_Tag_Ajax_Hooks {
 
 				$retval[$taxonomies[$i]][$target] = Accuracy::score($test_labels, $predictedLabels, true);
 
-				$args["taxonomy_name"] = $taxonomies[$i];
-				$args["accuracy"] = Accuracy::score($test_labels, $predictedLabels, true);
-				$args["tag_name"] = $target;
 
-				Classification::saveClassification($classifier, $args);
+				$term = new Term($target, $taxonomies[$i]);
+				$term->setAccuracy(Accuracy::score($test_labels, $predictedLabels, true));
+
+				Classification::saveClassification($classifier, $term, $args, $custom_name);
 
 			}
 
