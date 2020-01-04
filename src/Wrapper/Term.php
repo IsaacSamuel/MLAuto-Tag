@@ -16,10 +16,11 @@ class Term {
 	private $path;
 	private $accuracy;
 	private $classifier;
+	private $classification_id;
 
 
 	public function setPath(String $classifierPath) {
-		$this->path = $classifierPath . "/" . $this->taxonomy . "/" . $this->name;
+		$this->path = $classifierPath . $this->taxonomy . "/" . $this->name;
 	}
 
 	public function getPath() {
@@ -29,13 +30,21 @@ class Term {
 		return false;
 	}
 
-	public function setClassifier(Classifier &$classifier) {
+	public function setClassifier(Classifier &$classifier, int $id) {
 		$this->classifier = $classifier;
+		$this->classification_id = $id;
 	}
 
 	public function getClassifier() {
 		if (isset($this->classifier)) {
-			return $this->$classifier;
+			return $this->classifier;
+		}
+		return false;
+	}
+
+	public function getClassificationId() {
+		if (isset($this->classification_id)) {
+			return $this->classification_id;
 		}
 		return false;
 	}
@@ -58,10 +67,10 @@ class Term {
 		}
 	}
 
-	public function loadClassifier($path) {
+	public function loadClassifier() {
 		//Restore the saved classifier from file
 		$classifier = new Classifier();
-		$classifier->restore($path);
+		$classifier->restore($this->path);
 
 		$this->classifier = $classifier;
 	}

@@ -23,10 +23,9 @@ class TermModel {
 							  id mediumint(9) NOT NULL AUTO_INCREMENT,
 							  classification_id mediumint(9),
 					  		  taxonomy_name tinytext NOT NULL,
-					          tag_name tinytext NOT NULL,
+					          term_name tinytext NOT NULL,
 					          accuracy float,
 
-					          FOREIGN KEY (classification_id) REFERENCES $classification_table_name(id),
 							  PRIMARY KEY  (id)
 							) $charset_collate;";	
 
@@ -35,16 +34,10 @@ class TermModel {
 		}
 	}
 
-	public static function saveTerms(Object $term){
+	public static function saveTermModel(Object $term){
 		global $wpdb;
 
-		//Save Classification to file
-		/*$dir_of_serialized_object = 'bin/' . $custom_name . '/'.  $term->taxonomy . '/';
-		$create_dir = mkdir( MLAUTO_PLUGIN_URL . $dir_of_serialized_object, 0777, true);
-
-		$term->setPath(MLAUTO_PLUGIN_URL . "bin/" . $custom_name);
-		$term->saveToFile();*/
-
+		$term->saveToFile();
 
 		//Save Classification to DB
 		$table_name = $wpdb->prefix . 'MLAutoTag_Terms';
@@ -52,12 +45,27 @@ class TermModel {
 		$wpdb->insert( 
 			$table_name, 
 			array( 
-				'classification_id' => current_time( 'mysql' ), 
+				'classification_id' => $term->getClassificationId(), 
 				'taxonomy_name' => $term->taxonomy,
 				'accuracy' => $term->getAccuracy(),
 				'term_name' => $term->name,
 			) 
 		);
+	}
+
+
+	public static function getTerms(int $classification_id) {
+		global $wpdb;
+
+		$table_name = $wpdb->prefix . 'MLAutoTag_Terms';
+
+		return $wpdb->get_results( $wpdb->prepare(
+					"SELECT * 
+					FROM $table_name
+					WHERE classification_id = %d",
+					$classification_id));
+
+
 	}
 
 

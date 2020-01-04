@@ -1,7 +1,7 @@
 <?php
 
 use mlauto\Model\PostInfoAggregator;
-use mlauto\Model\ClassificationModelModel;
+use mlauto\Model\ClassificationModel;
 use mlauto\Model\TermModel;
 
 
@@ -92,23 +92,26 @@ class MLAuto_Tag_Ajax_Hooks {
 		//Identify classifier
 		//TODO: Have a selected classifier
 		//For now, we just use the most recent
-		$classifications = ClassificationModel::getClassifications(null);
+		$classification = ClassificationModel::getClassifications(null);
 
-		foreach($classifications as $classification) {
-			if (!isset($retval[$classification->taxonomy_name])) {
-				$retval[$classification->taxonomy_name] = array();
+		$termModels = TermModel::getTerms($classification->id);
+
+		foreach($termModels as $termModel) {
+			if (!isset($retval[$termModel->taxonomy_name])) {
+				$retval[$termModel->taxonomy_name] = array();
 			}
 
-			$term = new Term($classification->tag_name, $classification->taxonomy_name);
+			$term = new Term($termModel->term_name, $termModel->taxonomy_name);
+			$term->setPath(MLAUTO_PLUGIN_URL . $classification->classifier_directory);
 
-			$term->loadClassifier(MLAUTO_PLUGIN_URL . $classification->location_of_serialized_object);
+			$term->loadClassifier();
 
 			$term->predictProbability($vectorizer->vectorized_samples);
 
-			array_push($retval[$classification->taxonomy_name], array(
+			array_push($retval[$termModel->taxonomy_name], array(
 				"name" => $term->name,
 				"probabilities" => $term->predicted_probability,
-				"checked" => in_array($term->name, $selected_terms[$classification->taxonomy_name])
+				"checked" => in_array($term->name, $selected_terms[$termModel->taxonomy_name])
 			));
 		} 
 		
@@ -130,7 +133,8 @@ class MLAuto_Tag_Ajax_Hooks {
 
 		$vectorizer = new Vectorizer($info->features);
 
-				
+		$classificationModel = ClassificationModel::saveClassificationModel($args, $taxonomies);
+
 		for ($i=0; $i < count($taxonomies); $i++) { 
 
 			$retval[$taxonomies[$i]] = array();
@@ -164,11 +168,11 @@ class MLAuto_Tag_Ajax_Hooks {
 
 
 				$term = new Term($target, $taxonomies[$i]);
-				$term->setClassifier($classifier);
+				$term->setClassifier($classifier, $classificationModel->id);
+				$term->setPath(MLAUTO_PLUGIN_URL . $classificationModel->classifier_directory);
 				$term->setAccuracy(Accuracy::score($test_labels, $predictedLabels, true));
 
-				ClassificationModel::saveClassificationModel($term, $args);
-
+				TermModel::saveTermModel($term);
 			}
 
 		}

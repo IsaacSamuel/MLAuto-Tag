@@ -38,7 +38,7 @@ class ClassificationModel {
 	}
 
 
-	public static function saveClassification(array $args) {
+	public static function saveClassificationModel(array $args, $taxonomies) {
 		global $wpdb;
 
 		$specified_features = maybe_serialize($args["MLAuto_specified_features"]);
@@ -48,8 +48,11 @@ class ClassificationModel {
 		$training_percentage = $args["MLAuto_test_percentage"];
 		$custom_name = $args["MLAuto_classifier_name"];
 
+		//Create classifier directory and taxonomy directories
 		$classifier_directory = 'bin/' . $custom_name . '/';
-		mkdir( MLAUTO_PLUGIN_URL . $dir_of_serialized_object, 0777, true);
+		foreach($taxonomies as $taxonomy) {
+			mkdir( MLAUTO_PLUGIN_URL . $classifier_directory . $taxonomy, 0777, true);
+		}
 
 
 		//Save Classification to DB
@@ -65,21 +68,26 @@ class ClassificationModel {
 				'cost' => $cost,
 				'active' => $true,
 				'training_percentage' => $training_percentage,
-				'classifier_directory' => $directory_location,
+				'classifier_directory' => $classifier_directory,
 				'specified_features' => $specified_features,
 			) 
 		);
+
+		//return id of new classifier
+		return $wpdb->get_row(
+					"SELECT *
+					FROM $table_name
+					ORDER BY created_at DESC
+					LIMIT 1", OBJECT
+		);
+
 	}
 
 
 	public static function getClassifications($classifier_name) {
 		global $wpdb;
 
-
-		$classifier_terms = array();
-
 		$table_name = $wpdb->prefix . 'MLAutoTag_Classifications';
-
 
 		if (isset($classifier_name)) {
 			$classifications = $wpdb->get_results( $wpdb->prepare(
@@ -91,23 +99,13 @@ class ClassificationModel {
 		}
 		else {
 			//Barring a specified classifier, just use the most recent
-			$most_recent_classifier = $wpdb->get_var(
-					"SELECT custom_name
-					FROM $table_name
-					ORDER BY created_at DESC
-					LIMIT 1"
-				);
-
-			$classifications = $wpdb->get_results( $wpdb->prepare(
+			$classifications = $wpdb->get_row( $wpdb->prepare(
 					"SELECT * 
 					FROM $table_name
-					WHERE custom_name = %s",
+					ORDER BY created_at DESC
+					LIMIT 1",
 					$most_recent_classifier),
 					OBJECT);
-		}
-
-		if (count($classifications) == 0) {
-			throw new Exception("Could not find classification in db: " . $classification);
 		}
 
 		return $classifications;
