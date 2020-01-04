@@ -32,11 +32,21 @@ $test_percentage = $currentConfiguration["MLAuto_test_percentage"];
 
 ?>
 
+
 <div class="wrap">
         <div id="icon-themes" class="icon32"></div>  
         <h2>MLAuto Tag Settings</h2>  
-		<?php settings_errors(); ?>  
+		
+		<div id="mlauto_error"></div>
+
     	<form id="mlauto_save_settings_form">
+
+    		<div class="mlauto_settings_form_item">
+	        	<h3>Classifier Name</h3>
+	        	<p>Choose a name for your classifier. <strong>Reusing classifier names deletes classifier with the same name.</strong> If you leave the field blank, a unique timestamp will be used instead.</p>
+	        	<label for="MLAuto_classifier_name"><p><strong>Classifier Name:</strong></p></label>
+    			<input type="text" name="MLAuto_classifier_name" id="MLAuto_classifier_name"> 
+        	</div>
 
         	<div class="mlauto_settings_form_item">
 	        	<h3>Taxonomies</h3>
@@ -102,4 +112,13 @@ $test_percentage = $currentConfiguration["MLAuto_test_percentage"];
 				echo "<p><a href='#' id='generate_classifier' class='mlauto_button button button-primary'>Generate Classifier</a></p>";
             ?>  
         </form> 
+
+        <div id="current_classifier">
+
+        </div>
+
+
+        <div id="mlauto_past_classifiers">
+
+        </div>
 </div>

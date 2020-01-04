@@ -40,7 +40,7 @@ class Classification {
 
 	}
 
-	public static function saveClassification(Term &$term, array $args, $custom_name) {
+	public static function saveClassification(Term &$term, array $args) {
 		global $wpdb;
 
 		$specified_features = maybe_serialize($args["MLAuto_specified_features"]);
@@ -48,6 +48,7 @@ class Classification {
 		$tolerance = $args["MLAuto_tolerance"];
 		$cost = $args["MLAuto_cost"];
 		$training_percentage = $args["MLAuto_test_percentage"];
+		$custom_name = $args["MLAuto_classifier_name"];
 
 
 		//Save Classification to file
@@ -80,22 +81,7 @@ class Classification {
 	}
 
 
-	//Instead, get location by DB custom_name
 	public static function getClassifications($classifier_name) {
-		/*Retval format 
-			{
-				"taxonomy1"
-					{
-						"term1" : filepath
-						"term2" : filepath
-						...
-					}
-				"taxonomy2"
-					{...}
-				...
-			}
-		*/
-
 		global $wpdb;
 
 

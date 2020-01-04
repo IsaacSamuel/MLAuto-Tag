@@ -17,6 +17,7 @@ use Phpml\CrossValidation\RandomSplit;
 
 
 class MLAuto_Tag_Ajax_Hooks {
+
 	function saveSettings() {
 		$data = $_POST;
 
@@ -24,6 +25,15 @@ class MLAuto_Tag_Ajax_Hooks {
 			if (isset($data["settings"])) {
 		    	foreach ($data["settings"] as $setting) {
 		    		if (isset($setting["name"])) {
+		    			if($setting["name"] == "MLAuto_classifier_name") {
+		    				//delete any classification with this name
+
+		    				//If the user didn't select a custom name, make it a timestamp
+		    				if (!$setting["value"]) {
+								$setting["value"] = current_time('timestamp');
+		    				}
+
+		    			}
 		    			update_option($setting["name"], $setting["value"]);
 		    		}
 		    	}
@@ -118,15 +128,13 @@ class MLAuto_Tag_Ajax_Hooks {
 
 		$vectorizer = new Vectorizer($info->features);
 
-		$custom_name =  current_time('timestamp');
-
-
 				
 		for ($i=0; $i < count($taxonomies); $i++) { 
 
 			$retval[$taxonomies[$i]] = array();
 
 			foreach($info->targets_collection[$i] as $target) {
+
 
 				$labels = array_column($info->labels_collection, $i);
 
@@ -157,7 +165,7 @@ class MLAuto_Tag_Ajax_Hooks {
 				$term->setClassifier($classifier);
 				$term->setAccuracy(Accuracy::score($test_labels, $predictedLabels, true));
 
-				Classification::saveClassification($term, $args, $custom_name);
+				Classification::saveClassification($term, $args);
 
 			}
 

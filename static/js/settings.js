@@ -12,22 +12,23 @@ jQuery("#mlauto_save_settings_form").change(function() {
 });
 
 
-
-jQuery( "#save_settings" ).on("click", function( event ) {
+function saveSettings(event) {
 
 	//Prevent jumping to the top
 	event.preventDefault();
 
-	var $button = jQuery( this );
+	var button = jQuery( this );
 
-	if ($button.classList.className.includes("disabled")) {
+	if (button.hasClass("disabled")) {
 		return;
 	}
 
 	//Click feedback
-    $button.width( $button.width() ).text('...');
+    button.width( button.width() ).text('...');
 
-    let serialized_array = jQuery("#save_settings_form").serializeArray();
+    let serialized_array = jQuery("#mlauto_save_settings_form").serializeArray();
+
+    console.log(serialized_array);
 
 	var MLAuto_taxonomies = [];
 	var MLAuto_specified_features = [];
@@ -48,7 +49,7 @@ jQuery( "#save_settings" ).on("click", function( event ) {
 
 			return true;
 
-		});
+	});
 
 	serialized_form.push({name : "MLAuto_taxonomies", value : MLAuto_taxonomies});
 	serialized_form.push({name : "MLAuto_specified_features", value : MLAuto_specified_features});
@@ -58,41 +59,40 @@ jQuery( "#save_settings" ).on("click", function( event ) {
 
 	serialized_form["action"] = 'saveSettings';
 
-	//json_form = JSON.stringify(serialized_form);
-
-	
-	//console.log(json_form);
-
 	console.log(serialized_form)
 
 	jQuery.post( MLAuto_Ajax_Settings.ajaxurl, serialized_form)
 		.done( function(response ) {
 	        console.log(response);
 
-	       	$button.width( $button.width() ).text('Save Settings');
+	       	button.width( button.width() ).text('Save Settings');
 
 			button.addClass("disabled");
+    	})
+    	.fail(function(xhr, status, error) {
 
-			button = jQuery("#generate_classifier");
+			jQuery("#mlauto_error").html(xhr.responseText);
+    		
+			button.width( button.width() ).text('Save Settings');
+	    });
+}
 
-			button.removeClass("disabled");
-    	});
-})
+
+jQuery( "#save_settings" ).on("click", function( event ) {
+	saveSettings(event);
+});
+
 
 jQuery( "#generate_classifier" ).on("click", function( event ) {
 
 	//Prevent jumping to the top
 	event.preventDefault();
 
-	var $button = jQuery( this );
-
-	if ($button.classList.className.includes("disabled")) {
-		return;
-	}
+	var button = jQuery( this );
 
 
 	//Click feedback
-    $button.width( $button.width() ).text('...');
+    button.width( button.width() ).text('...');
 
 
     var data = {"action" : "generateClassifier"};
@@ -103,13 +103,13 @@ jQuery( "#generate_classifier" ).on("click", function( event ) {
 
 	        console.log(response);
 
-	        $button.width( $button.width() ).text('Generate Classifier');
+	        button.width( button.width() ).text('Generate Classifier');
 	    })
 
 		.fail(function(xhr, status, error) {
-			console.log(xhr.responseText);
+			jQuery( "#mlauto_error" ).html(xhr.responseText);
 
-			$button.width( $button.width() ).text('Classify Post');
+			button.width( button.width() ).text('Generate Classifier');
 	    });
 });
 

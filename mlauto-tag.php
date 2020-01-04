@@ -43,6 +43,7 @@ class MLAuto_Tag {
 		add_option('MLAuto_cache_size', 100);
 		add_option('MLAuto_label_minimum_count', 1);
 		add_option('MLAuto_save_old_classifiers', true);
+		add_option('MLAuto_classifier_name', current_time('timestamp'));
 
 	}
 
@@ -197,7 +198,8 @@ class MLAuto_Tag {
 			"MLAuto_save_old_classifiers" => (get_option('MLAuto_save_old_classifiers') == "false" ? false : true) ,
 			"MLAuto_specified_features" => get_option('MLAuto_specified_features'),
 			"MLAuto_label_minimum_count" => get_option('MLAuto_label_minimum_count'),
-			"MLAuto_test_percentage" => floatval(get_option('MLAuto_test_percentage'))
+			"MLAuto_test_percentage" => floatval(get_option('MLAuto_test_percentage')),
+			"MLAuto_classifier_name" => get_option("MLAuto_classifier_name")
 		);
 	}
 
