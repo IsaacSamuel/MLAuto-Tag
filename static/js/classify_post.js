@@ -123,12 +123,9 @@ jQuery( "#classify_post" ).on("click", function( event ) {
 					container_div.appendChild(taxonomy_div);
 				});
 			}
-			//If error
 
-				//Display error
-
-			//Put button back to normal
-			$button.width( $button.width() ).text('Classify Post');
+			//Hide button
+			$button.css("display", "none");
 
 	})
 	.fail(function(xhr, status, error) {

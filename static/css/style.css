@@ -11,14 +11,16 @@
 
 /*Settings page*/
 
-#mlauto_save_settings_form {
-	display : flex;
-	flex-wrap: wrap;
-
+.classifier_container {
 	margin: 2%;
 	padding: 2%;
 	background-color: #cccccc;
 	border-radius: 5px;
+}
+
+#mlauto_save_settings_form {
+	display : flex;
+	flex-wrap: wrap;
 }
 
 #mlauto_save_settings_form > div {
@@ -49,4 +51,19 @@
   #mlauto_save_settings_form > div {
   	width: 100%;
   }
+}
+
+
+.mlauto_classifier_info_item {
+	margin-right: 3em;
+}
+
+
+.mlauto_classifier_info_item > span {
+	margin-right: 2em;
+}
+
+.classifier_info_list {
+	display: flex;
+	flex-wrap: wrap;
 }

@@ -29,6 +29,7 @@ class ClassificationModel {
 							  tolerance float,
 							  training_percentage float,
 							  specified_features TEXT,
+							  selected_taxonomies TEXT,
 							  PRIMARY KEY  (id)
 							) $charset_collate;";
 
@@ -42,6 +43,7 @@ class ClassificationModel {
 		global $wpdb;
 
 		$specified_features = maybe_serialize($args["MLAuto_specified_features"]);
+		$selected_taxonomies = maybe_serialize($args["MLAuto_taxonomies"]);
 		$gamma = $args["MLAuto_gamma"];
 		$tolerance = $args["MLAuto_tolerance"];
 		$cost = $args["MLAuto_cost"];
@@ -66,10 +68,11 @@ class ClassificationModel {
 				'gamma' => $gamma,
 				'tolerance' => $tolerance,
 				'cost' => $cost,
-				'active' => $true,
+				'active' => true,
 				'training_percentage' => $training_percentage,
 				'classifier_directory' => $classifier_directory,
 				'specified_features' => $specified_features,
+				'selected_taxonomies' => $selected_taxonomies,
 			) 
 		);
 
@@ -84,27 +87,26 @@ class ClassificationModel {
 	}
 
 
-	public static function getClassifications($classifier_name) {
+	public static function getClassificationModel(int $classifier_id) {
 		global $wpdb;
 
 		$table_name = $wpdb->prefix . 'MLAutoTag_Classifications';
 
-		if (isset($classifier_name)) {
+		if ($classifier_id !== 0) {
 			$classifications = $wpdb->get_results( $wpdb->prepare(
 					"SELECT * 
 					FROM $table_name
-					WHERE custom_name = %s",
-					$classifier_name),
+					WHERE id = %d",
+					$classifier_id),
 					OBJECT);
 		}
 		else {
 			//Barring a specified classifier, just use the most recent
-			$classifications = $wpdb->get_row( $wpdb->prepare(
+			$classifications = $wpdb->get_row(
 					"SELECT * 
 					FROM $table_name
 					ORDER BY created_at DESC
 					LIMIT 1",
-					$most_recent_classifier),
 					OBJECT);
 		}
 

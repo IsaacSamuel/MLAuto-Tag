@@ -17,7 +17,7 @@ function saveSettings(event) {
 	//Prevent jumping to the top
 	event.preventDefault();
 
-	var button = jQuery( this );
+	var button = jQuery( "#save_settings" );
 
 	if (button.hasClass("disabled")) {
 		return;
@@ -27,8 +27,6 @@ function saveSettings(event) {
     button.width( button.width() ).text('...');
 
     let serialized_array = jQuery("#mlauto_save_settings_form").serializeArray();
-
-    console.log(serialized_array);
 
 	var MLAuto_taxonomies = [];
 	var MLAuto_specified_features = [];

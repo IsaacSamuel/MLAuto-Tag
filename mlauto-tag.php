@@ -45,7 +45,7 @@ class MLAuto_Tag {
 		add_option('MLAuto_cache_size', 100);
 		add_option('MLAuto_label_minimum_count', 1);
 		add_option('MLAuto_save_old_classifiers', true);
-		add_option('MLAuto_classifier_name', current_time('timestamp'));
+		add_option('MLAuto_classifier_id', 0);
 
 	}
 
@@ -66,76 +66,6 @@ class MLAuto_Tag {
 		    'ajaxurl'    => admin_url( 'admin-ajax.php' ),
 		) );
     }
-
-/*
-    private function testClassifier() {
-
-    	$retval = array();
-
-		$args = $this->getConfig();
-
-		$taxonomies = $args["MLAuto_taxonomies"];//, "post_tag");
-
-		$info = new PostInfoAggregator($taxonomies, $args["MLAuto_specified_features"]);
-
-		$vectorizer = new Vectorizer($info->features);
-
-		$args["custom_name"] = current_time( 'timestamp' );
-
-
-		for ($i=0; $i < count($taxonomies); $i++) { 
-
-			$retval[$taxonomies[$i]] = array();
-
-			foreach($info->targets_collection[$i] as $target) {
-
-				$labels = array_column($info->labels_collection, $i);
-
-				$vectorized_labels = $vectorizer->vectorize_labels($labels, $target);
-
-
-				$dataset = new ArrayDataset($vectorizer->vectorized_samples, $vectorized_labels);
-
-				$randomizedDataset = new RandomSplit($dataset, 0.2);
-
-				//train group
-				$train_samples = $randomizedDataset->getTrainSamples();
-				$train_labels = $randomizedDataset->getTrainLabels();
-
-				//test group
-				$test_samples = $randomizedDataset->getTestSamples();
-				$test_labels = $randomizedDataset->getTestLabels();
-
-
-				//Classify
-				$classifier = new Classifier($train_samples, $train_labels, $args);
-				$classifier->trainClassifier($train_samples, $train_labels, $args);
-
-				//Test
-				$predictedLabels = $classifier->predict($test_samples, $test_labels);
-
-
-				//Return accuracy
-				$retval[$taxonomies[$i]][$target] = Accuracy::score($test_labels, $predictedLabels, true);
-
-
-				//Save classifier info to database, and classifier binary to file
-				$args["taxonomy_name"] = $taxonomies[$i];
-				$args["accuracy"] = Accuracy::score($test_labels, $predictedLabels, true);
-				$args["tag_name"] = $target;
-				$args["training_percentage"] = .75;
-
-				ClassificationModel::saveClassificationModel($classifier, $args);
-
-			}
-
-		}
-
-		var_dump($retval);
-
-		wp_die();
-    }
-*/
 
     public function mlauto_metabox_save_meta( $post_id ) {
 
@@ -201,7 +131,8 @@ class MLAuto_Tag {
 			"MLAuto_specified_features" => get_option('MLAuto_specified_features'),
 			"MLAuto_label_minimum_count" => get_option('MLAuto_label_minimum_count'),
 			"MLAuto_test_percentage" => floatval(get_option('MLAuto_test_percentage')),
-			"MLAuto_classifier_name" => get_option("MLAuto_classifier_name")
+			"MLAuto_classifier_name" => get_option("MLAuto_classifier_name"),
+			"MLAuto_classifier_id" => intval(get_option("MLAuto_classifier_id"))
 		);
 	}
 

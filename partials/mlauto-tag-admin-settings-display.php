@@ -12,6 +12,9 @@
  * @subpackage PluginName/admin/partials
  */
 
+use mlauto\Model\ClassificationModel;
+
+
 
 $currentConfiguration = $this->getConfig();
 
@@ -30,25 +33,31 @@ $cost = $currentConfiguration["MLAuto_cost"];
 $tolerance = $currentConfiguration["MLAuto_tolerance"];
 $test_percentage = $currentConfiguration["MLAuto_test_percentage"];
 
+
+$current_classification = ClassificationModel::getClassificationModel(0);
+
 ?>
 
 
 <div class="wrap">
-        <div id="icon-themes" class="icon32"></div>  
-        <h2>MLAuto Tag Settings</h2>  
-		
-		<div id="mlauto_error"></div>
+    <div id="icon-themes" class="icon32"></div>  
+    <h1>MLAuto Tag: Generate Classifiers</h1>  
+	
+	<div id="mlauto_error"></div>
 
-    	<form id="mlauto_save_settings_form">
+	<div class="classifier_container">
+		<h2>Generate a new classifier</h2>
+		<br>
 
-    		<div class="mlauto_settings_form_item">
+		<form id="mlauto_save_settings_form">
+			<div class="mlauto_settings_form_item">
 	        	<h3>Classifier Name</h3>
-	        	<p>Choose a name for your classifier. <strong>Reusing classifier names deletes classifier with the same name.</strong> If you leave the field blank, a unique timestamp will be used instead.</p>
+	        	<p>Choose a name for your classifier. <strong>Reusing classifier names deletes classifiers with the same name.</strong> If you leave the field blank, a unique timestamp will be used instead.</p>
 	        	<label for="MLAuto_classifier_name"><p><strong>Classifier Name:</strong></p></label>
-    			<input type="text" name="MLAuto_classifier_name" id="MLAuto_classifier_name"> 
-        	</div>
+				<input type="text" name="MLAuto_classifier_name" id="MLAuto_classifier_name"> 
+	    	</div>
 
-        	<div class="mlauto_settings_form_item">
+	    	<div class="mlauto_settings_form_item">
 	        	<h3>Taxonomies</h3>
 	        	<p>Select the taxonomies you'd like to run the classifier upon. <strong>Note:</strong> The classifier runs a lot better on taxonomies with a lot of examples. Taxonomies with very few matching posts will not be predicted well.</p>
 	        	<div class="mlauto_checkbox">
@@ -56,28 +65,28 @@ $test_percentage = $currentConfiguration["MLAuto_test_percentage"];
 	        			<input type=checkbox name="taxonomies" value=<?php echo '"' . $name . '" ' . (in_array($name, $currentConfiguration["MLAuto_taxonomies"]) ? "checked" : "" ) ?> id = <?php echo $name ?> > 
 	        			<label for=<?php echo '"' . $name . '"' ?>><?php echo $name ?> </label>
 	        		<?php } ?>
-        		</div>
-        	</div>
+	    		</div>
+	    	</div>
 
 
-        	<div class="mlauto_settings_form_item">
-        		<h3>Features</h3>
+	    	<div class="mlauto_settings_form_item">
+	    		<h3>Features</h3>
 	        	<p>Features are the data that the classifier will use to predict which classification(s) your post belongs in. The more numberous and less random the features, the more accurate the classifier will get in general, but the longer it will take to run.</p>
-        		
-        		<div class="mlauto_checkbox">
+	    		
+	    		<div class="mlauto_checkbox">
 	        		<?php foreach ($features as $feature) { ?>
 	        			<input type=checkbox name="features" value=<?php echo '"' . $feature . '" ' . (in_array($feature, $currentConfiguration["MLAuto_specified_features"]) ? "checked" : "" ) ?> id = <?php echo $feature ?> > 
 	        			<label for=<?php echo '"' . $feature . '"' ?>><?php echo $feature ?> </label>
 	        		<?php } ?>
-        		</div>
-        	</div>
+	    		</div>
+	    	</div>
 
 
-        	<div class="mlauto_settings_form_item">
-        		<h3>Save old classifiers?</h3>
-        		<p>Once a classifier is generated, it is saved to file. Depending on various factors, such as the number of features being used to predict classifications, and the number of classifications, these files can get large and/or numerous. If space is a concern, you shouldn't save old classifiers; you should only keep the most recent one. However, if you testing and fiddling with settings to find an optimal mix of settings, there may be value in keeping old classifiers.</p>
-        		<!--Add current space being taken up-->
-        		  <input type="radio" id="save_old_classifiers" name="MLAuto_save_old_classifiers" value="true"
+	    	<div class="mlauto_settings_form_item">
+	    		<h3>Save old classifiers?</h3>
+	    		<p>Once a classifier is generated, it is saved to file. Depending on various factors, such as the number of features being used to predict classifications, and the number of classifications, these files can get large and/or numerous. If space is a concern, you shouldn't save old classifiers; you should only keep the most recent one. However, if you testing and fiddling with settings to find an optimal mix of settings, there may be value in keeping old classifiers.</p>
+	    		<!--Add current space being taken up-->
+	    		  <input type="radio" id="save_old_classifiers" name="MLAuto_save_old_classifiers" value="true"
 				         <?php echo (currentConfiguration["MLAuto_save_old_classifiers"] == true ? "checked" : "")?>>
 				  <label for="save_old_classifiers">Save old classifiers</label>
 				  <br>
@@ -102,23 +111,53 @@ $test_percentage = $currentConfiguration["MLAuto_test_percentage"];
 	        	<input type="number" id="MLAuto_tolerance" step=".0005" name="MLAuto_tolerance" value=<?php echo $tolerance ?>>
 	        	<label for="MLAuto_tolerance"><strong>Tolerance</strong> (Default: .001)</label>
 
-	        	<br>
-	        	<input type="number" step=".025" id="MLAuto_test_percentage" name="MLAuto_test_percentage" value=<?php echo $test_percentage ?>>
-	        	<label for="MLAuto_test_percentage"><strong>Test Percentage Size</strong> (Default: .2 (20%))</label>
-	        </div>
-	        <?php 
-	            echo "<p><a href='#' id='save_settings' class='disabled mlauto_button button button-primary'>Save Settings</a></p>";
-	            
-				echo "<p><a href='#' id='generate_classifier' class='mlauto_button button button-primary'>Generate Classifier</a></p>";
-            ?>  
-        </form> 
+		        	<br>
+		        	<input type="number" step=".025" id="MLAuto_test_percentage" name="MLAuto_test_percentage" value=<?php echo $test_percentage ?>>
+		        	<label for="MLAuto_test_percentage"><strong>Test Percentage Size</strong> (Default: .2 (20%))</label>
+		        </div>
+		</form>
 
-        <div id="current_classifier">
+        <?php 
+        	echo "<p><a href='#' id='save_settings' class='disabled mlauto_button button button-primary'>Save Settings</a></p>";
+            
+			echo "<p><a href='#' id='generate_classifier' class='mlauto_button button button-primary'>Generate Classifier</a></p>";
+        ?>  
+	</div>
 
-        </div>
+    <div id="current_classifier" class="classifier_container">
+    	<h2>Current Classifier</h2>
+    	<p><strong>Name:</strong> <?php echo  $current_classification->custom_name ?></p>
+    	<div class="classifier_info_list">
+    		<div class="mlauto_classifier_info_item">
+    			<p><strong>Selected Taxonomies:</strong></p>
+    			<?php 
+    			foreach(maybe_unserialize($current_classification->selected_taxonomies) as $taxonomy) {
+    				echo ("<span>" . $taxonomy . "</span>");
+    			} ?>
+    		</div>
+
+    		<div class="mlauto_classifier_info_item">
+    			<p><strong>Selected Features:</strong></p>
+    			<?php 
+    			foreach(maybe_unserialize($current_classification->specified_features) as $feature) {
+    				echo ("<span>" . $feature . "</span>");
+    			} ?>
+    		</div>
+
+    		<div class="mlauto_classifier_info_item">
+    			<p><strong>Advanced settings:</strong></p>
+    			<?php 
+    				echo "<span><strong>Gamma: </strong>" . $current_classification->gamma . "</span>";
+					echo "<span><strong>Tolerance: </strong>" . $current_classification->tolerance . "</span>";
+					echo "<span><strong>Training Percentage: </strong>" . $current_classification->training_percentage . "</span>";
+					echo "<span><strong>Cost: </strong>" . $current_classification->cost . "</span>";
+    			?>
+    		</div>
+    	</div>
+    </div>
 
 
-        <div id="mlauto_past_classifiers">
+    <div id="mlauto_past_classifiers">
 
-        </div>
+    </div>
 </div>

@@ -92,7 +92,7 @@ class MLAuto_Tag_Ajax_Hooks {
 		//Identify classifier
 		//TODO: Have a selected classifier
 		//For now, we just use the most recent
-		$classification = ClassificationModel::getClassifications(null);
+		$classification = ClassificationModel::getClassificationModel(null);
 
 		$termModels = TermModel::getTerms($classification->id);
 
