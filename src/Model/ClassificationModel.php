@@ -6,14 +6,17 @@ namespace mlauto\Model;
 
 use mlauto\Wrapper\Term;
 
+global $wpdb;
+
 
 class ClassificationModel {
 
 	public static function intializeTable() {
-
 		global $wpdb;
-		$charset_collate = $wpdb->get_charset_collate();
 		$table_name = $wpdb->prefix . 'MLAutoTag_Classifications';
+
+
+		$charset_collate = $wpdb->get_charset_collate();
 
 		//If table does not exist
 		if(!$wpdb->get_var("SHOW TABLES LIKE '$table_name'") == $table_name) {	
@@ -41,6 +44,8 @@ class ClassificationModel {
 
 	public static function saveClassificationModel(array $args, $taxonomies) {
 		global $wpdb;
+		$table_name = $wpdb->prefix . 'MLAutoTag_Classifications';
+
 
 		$specified_features = maybe_serialize($args["MLAuto_specified_features"]);
 		$selected_taxonomies = maybe_serialize($args["MLAuto_taxonomies"]);
@@ -58,7 +63,6 @@ class ClassificationModel {
 
 
 		//Save Classification to DB
-		$table_name = $wpdb->prefix . 'MLAutoTag_Classifications';
 		
 		$wpdb->insert( 
 			$table_name, 
@@ -89,8 +93,8 @@ class ClassificationModel {
 
 	public static function getClassificationModel(int $classifier_id) {
 		global $wpdb;
-
 		$table_name = $wpdb->prefix . 'MLAutoTag_Classifications';
+
 
 		if ($classifier_id !== 0) {
 			$classifications = $wpdb->get_results( $wpdb->prepare(
@@ -109,6 +113,20 @@ class ClassificationModel {
 					LIMIT 1",
 					OBJECT);
 		}
+
+		return $classifications;
+	}
+
+	public static function getClassificationModels() {
+		global $wpdb;
+		$table_name = $wpdb->prefix . 'MLAutoTag_Classifications';
+
+
+		$classifications = $wpdb->get_results(
+					"SELECT * 
+					FROM $table_name
+					WHERE active = true",
+					OBJECT);
 
 		return $classifications;
 	}

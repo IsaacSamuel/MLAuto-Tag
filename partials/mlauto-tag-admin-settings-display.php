@@ -45,7 +45,7 @@ $current_classification = ClassificationModel::getClassificationModel(0);
 	
 	<div id="mlauto_error"></div>
 
-	<div class="classifier_container">
+	<div class="mlauto_classifier_container">
 		<h2>Generate a new classifier</h2>
 		<br>
 
@@ -117,17 +117,17 @@ $current_classification = ClassificationModel::getClassificationModel(0);
 		        </div>
 		</form>
 
-        <?php 
-        	echo "<p><a href='#' id='save_settings' class='disabled mlauto_button button button-primary'>Save Settings</a></p>";
-            
+        <?php             
 			echo "<p><a href='#' id='generate_classifier' class='mlauto_button button button-primary'>Generate Classifier</a></p>";
         ?>  
 	</div>
 
-    <div id="current_classifier" class="classifier_container">
+    <div id="current_classifier" class="mlauto_classifier_container">
     	<h2>Current Classifier</h2>
     	<p><strong>Name:</strong> <?php echo  $current_classification->custom_name ?></p>
-    	<div class="classifier_info_list">
+    	<p><strong>Created at:</strong> <?php echo date("m/d/y g:i A", $classification_model->created_at) ?></p>
+
+    	<div class="mlauto_classifier_info_list">
     		<div class="mlauto_classifier_info_item">
     			<p><strong>Selected Taxonomies:</strong></p>
     			<?php 
@@ -157,7 +157,8 @@ $current_classification = ClassificationModel::getClassificationModel(0);
     </div>
 
 
+    <h2>Past Classifiers</h2>
     <div id="mlauto_past_classifiers">
-
+    	<?php include("mlauto-classifier-brief.php"); ?>
     </div>
 </div>

@@ -11,11 +11,13 @@
 
 /*Settings page*/
 
-.classifier_container {
+.mlauto_classifier_container {
 	margin: 2%;
-	padding: 2%;
+	padding: 1%;
 	background-color: #cccccc;
 	border-radius: 5px;
+
+	overflow: auto;
 }
 
 #mlauto_save_settings_form {
@@ -40,7 +42,8 @@
 }
 
 .mlauto_button {
-	margin-right: 10px !important;
+	margin-top: 2em !important;
+	float: right;
 }
 
 @media screen and (max-width: 500px) {
@@ -54,8 +57,13 @@
 }
 
 
+
+#mlauto_past_classifiers {
+	margin-left : 2%;
+}
+
 .mlauto_classifier_info_item {
-	margin-right: 3em;
+	margin-bottom: .5em;
 }
 
 
@@ -66,4 +74,42 @@
 .classifier_info_list {
 	display: flex;
 	flex-wrap: wrap;
+}
+
+.mlauto_classifier_info_item p {
+	display: inline-block;
+	line-height: .8em;
+	margin-right: 1em;
+}
+
+
+#mlauto_past_classifiers {
+	display: flex;
+	flex-wrap: wrap;
+}
+
+.mlauto_past_classifier {
+	margin-right: 1%;
+	margin-bottom: 1%;
+	padding: 2% 2% 2% 2%;
+	background-color: #cccccc;
+	border-radius: 5px;
+	width: 44%;
+}
+
+
+.mlauto_classifier_info_list {
+	display: flex;
+	flex-wrap: wrap;
+}
+
+.mlauto_delete_classifer {
+	margin-right: 1.5em !important;
+}
+
+
+@media screen and (max-width: 1500px) {
+  .mlauto_past_classifier  {
+  	width: 100%;
+  }
 }
