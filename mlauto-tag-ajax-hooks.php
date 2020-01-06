@@ -35,7 +35,6 @@ class MLAuto_Tag_Ajax_Hooks {
 			update_option('MLAuto_cost', $model->cost);
 			update_option('MLAuto_gamma', $model->gamma);
 			update_option('MLAuto_tolerance', $model->tolerance);
-			update_option('MLAuto_cache_size', $model->specified_features);
 
 		}
 
