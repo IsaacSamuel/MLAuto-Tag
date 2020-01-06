@@ -1,4 +1,4 @@
-function generateClassifier() {
+function mlauto_generateClassifier() {
 
 	button = jQuery( "#generate_classifier" );
 
@@ -23,7 +23,7 @@ function generateClassifier() {
 
 
 
-function saveSettings(event) {
+function mlauto_saveSettings(event) {
 
     let serialized_array = jQuery("#mlauto_save_settings_form").serializeArray();
 
@@ -61,7 +61,7 @@ function saveSettings(event) {
 	jQuery.post( MLAuto_Ajax_Settings.ajaxurl, serialized_form)
 		.done( function(response ) {
 
-			generateClassifier();
+			mlauto_generateClassifier();
 
     	})
     	.fail(function(xhr, status, error) {
@@ -84,7 +84,76 @@ jQuery( "#generate_classifier" ).on("click", function( event ) {
     button.width( button.width() ).text('...');
 
 
-    saveSettings(event);
+    mlauto_saveSettings(event);
 
 });
 
+
+
+jQuery( ".mlauto_select_classifer" ).on("click", function( event ) {
+
+	//Prevent jumping to the top
+	event.preventDefault();
+
+	button = jQuery( this );
+
+	//Click feedback
+    button.width( button.width() ).text('...');
+
+
+    let classifier_id = button.attr("value");
+
+    var data = {
+    	"action" : "selectClassifier",
+    	"classifier_id" : classifier_id
+	};
+
+
+	jQuery.post( MLAuto_Ajax_Settings.ajaxurl, data)
+		.done( function(response ) {
+
+	        console.log(response);
+
+	        button.width( button.width() ).text('Select Classifier');
+	    })
+
+		.fail(function(xhr, status, error) {
+			jQuery( "#mlauto_error" ).html(xhr.responseText);
+
+			button.width( button.width() ).text('Select Classifier');
+	    });
+});
+
+
+jQuery( ".mlauto_delete_classifer" ).on("click", function( event ) {
+
+	//Prevent jumping to the top
+	event.preventDefault();
+
+	button = jQuery( this );
+
+	//Click feedback
+    button.width( button.width() ).text('...');
+
+    let classifier_id = button.attr("value");
+
+    var data = {
+    	"action" : "selectClassifier",
+    	"classifier_id" : classifier_id
+	};
+	
+
+	jQuery.post( MLAuto_Ajax_Settings.ajaxurl, data)
+		.done( function(response ) {
+
+	        console.log(response);
+
+	        button.width( button.width() ).text('Delete Classifier');
+	    })
+
+		.fail(function(xhr, status, error) {
+			jQuery( "#mlauto_error" ).html(xhr.responseText);
+
+			button.width( button.width() ).text('Delete Classifier');
+	    });
+});
