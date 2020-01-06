@@ -42,10 +42,9 @@ class ClassificationModel {
 	}
 
 
-	public static function saveClassificationModel(array $args, $taxonomies) {
+	public static function saveClassificationModel(array $args) {
 		global $wpdb;
 		$table_name = $wpdb->prefix . 'MLAutoTag_Classifications';
-
 
 		$specified_features = maybe_serialize($args["MLAuto_specified_features"]);
 		$selected_taxonomies = maybe_serialize($args["MLAuto_taxonomies"]);
@@ -57,7 +56,7 @@ class ClassificationModel {
 
 		//Create classifier directory and taxonomy directories
 		$classifier_directory = 'bin/' . $custom_name . '/';
-		foreach($taxonomies as $taxonomy) {
+		foreach($args["MLAuto_taxonomies"] as $taxonomy) {
 			mkdir( MLAUTO_PLUGIN_URL . $classifier_directory . $taxonomy, 0777, true);
 		}
 
@@ -97,7 +96,7 @@ class ClassificationModel {
 
 
 		if ($classifier_id !== 0) {
-			$classifications = $wpdb->get_results( $wpdb->prepare(
+			$classifications = $wpdb->get_row( $wpdb->prepare(
 					"SELECT * 
 					FROM $table_name
 					WHERE id = %d",
@@ -125,7 +124,8 @@ class ClassificationModel {
 		$classifications = $wpdb->get_results(
 					"SELECT * 
 					FROM $table_name
-					WHERE active = true",
+					WHERE active = true
+					ORDER BY created_at DESC",
 					OBJECT);
 
 		return $classifications;

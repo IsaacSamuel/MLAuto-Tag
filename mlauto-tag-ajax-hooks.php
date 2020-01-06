@@ -92,7 +92,7 @@ class MLAuto_Tag_Ajax_Hooks {
 		//Identify classifier
 		//TODO: Have a selected classifier
 		//For now, we just use the most recent
-		$classification = ClassificationModel::getClassificationModel(null);
+		$classification = ClassificationModel::getClassificationModel($args["MLAuto_classifier_id"]);
 
 		$termModels = TermModel::getTerms($classification->id);
 
@@ -133,7 +133,9 @@ class MLAuto_Tag_Ajax_Hooks {
 
 		$vectorizer = new Vectorizer($info->features);
 
-		$classificationModel = ClassificationModel::saveClassificationModel($args, $taxonomies);
+		$classificationModel = ClassificationModel::saveClassificationModel($args);
+		update_option("MLAuto_classifier_id", $classificationModel->id);
+
 
 		for ($i=0; $i < count($taxonomies); $i++) { 
 

@@ -1,30 +1,29 @@
+function generateClassifier() {
+
+	button = jQuery( "#generate_classifier" );
+
+    var data = {"action" : "generateClassifier"};
 
 
-//If a setting changes in the form, you must save the new settings before you generate a classifier
-jQuery("#mlauto_save_settings_form").change(function() {
-	let button = jQuery("#save_settings");
+	jQuery.post( MLAuto_Ajax_Settings.ajaxurl, data)
+		.done( function(response ) {
 
-	button.removeClass("disabled");
+	        console.log(response);
 
-	button = jQuery("#generate_classifier");
+	        button.width( button.width() ).text('Generate Classifier');
+	    })
 
-	button.addClass("disabled");
-});
+		.fail(function(xhr, status, error) {
+			jQuery( "#mlauto_error" ).html(xhr.responseText);
+
+			button.width( button.width() ).text('Generate Classifier');
+	    });
+
+}
+
 
 
 function saveSettings(event) {
-
-	//Prevent jumping to the top
-	event.preventDefault();
-
-	var button = jQuery( "#save_settings" );
-
-	if (button.hasClass("disabled")) {
-		return;
-	}
-
-	//Click feedback
-    button.width( button.width() ).text('...');
 
     let serialized_array = jQuery("#mlauto_save_settings_form").serializeArray();
 
@@ -61,11 +60,9 @@ function saveSettings(event) {
 
 	jQuery.post( MLAuto_Ajax_Settings.ajaxurl, serialized_form)
 		.done( function(response ) {
-	        console.log(response);
 
-	       	button.width( button.width() ).text('Save Settings');
+			generateClassifier();
 
-			button.addClass("disabled");
     	})
     	.fail(function(xhr, status, error) {
 
@@ -76,11 +73,6 @@ function saveSettings(event) {
 }
 
 
-jQuery( "#save_settings" ).on("click", function( event ) {
-	saveSettings(event);
-});
-
-
 jQuery( "#generate_classifier" ).on("click", function( event ) {
 
 	//Prevent jumping to the top
@@ -88,26 +80,11 @@ jQuery( "#generate_classifier" ).on("click", function( event ) {
 
 	var button = jQuery( this );
 
-
 	//Click feedback
     button.width( button.width() ).text('...');
 
 
-    var data = {"action" : "generateClassifier"};
+    saveSettings(event);
 
-
-	jQuery.post( MLAuto_Ajax_Settings.ajaxurl, data)
-		.done( function(response ) {
-
-	        console.log(response);
-
-	        button.width( button.width() ).text('Generate Classifier');
-	    })
-
-		.fail(function(xhr, status, error) {
-			jQuery( "#mlauto_error" ).html(xhr.responseText);
-
-			button.width( button.width() ).text('Generate Classifier');
-	    });
 });
 

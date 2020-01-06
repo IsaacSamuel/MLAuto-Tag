@@ -34,7 +34,7 @@ $tolerance = $currentConfiguration["MLAuto_tolerance"];
 $test_percentage = $currentConfiguration["MLAuto_test_percentage"];
 
 
-$current_classification = ClassificationModel::getClassificationModel(0);
+$current_classification = ClassificationModel::getClassificationModel($currentConfiguration["MLAuto_classifier_id"]);
 
 ?>
 
@@ -67,7 +67,6 @@ $current_classification = ClassificationModel::getClassificationModel(0);
 	        		<?php } ?>
 	    		</div>
 	    	</div>
-
 
 	    	<div class="mlauto_settings_form_item">
 	    		<h3>Features</h3>

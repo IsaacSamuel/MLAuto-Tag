@@ -71,7 +71,7 @@
 	margin-right: 2em;
 }
 
-.classifier_info_list {
+.mlauto_classifier_info_list {
 	display: flex;
 	flex-wrap: wrap;
 }
