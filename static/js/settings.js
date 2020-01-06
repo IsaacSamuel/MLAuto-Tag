@@ -8,9 +8,8 @@ function mlauto_generateClassifier() {
 	jQuery.post( MLAuto_Ajax_Settings.ajaxurl, data)
 		.done( function(response ) {
 
-	        console.log(response);
+			location.reload(); 
 
-	        button.width( button.width() ).text('Generate Classifier');
 	    })
 
 		.fail(function(xhr, status, error) {
@@ -112,7 +111,6 @@ jQuery( ".mlauto_select_classifer" ).on("click", function( event ) {
 	jQuery.post( MLAuto_Ajax_Settings.ajaxurl, data)
 		.done( function(response ) {
 
-
 			location.reload(); 
 
 	    })
@@ -146,8 +144,8 @@ jQuery( ".mlauto_delete_classifer" ).on("click", function( event ) {
 	jQuery.post( MLAuto_Ajax_Settings.ajaxurl, data)
 		.done( function(response ) {
 
-			location.reload(); 
-			
+			jQuery("#mlauto_classifier_model_" + classifier_id ).fadeOut()
+
 	    })
 
 		.fail(function(xhr, status, error) {
