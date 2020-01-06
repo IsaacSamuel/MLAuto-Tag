@@ -112,9 +112,9 @@ jQuery( ".mlauto_select_classifer" ).on("click", function( event ) {
 	jQuery.post( MLAuto_Ajax_Settings.ajaxurl, data)
 		.done( function(response ) {
 
-	        console.log(response);
 
-	        button.width( button.width() ).text('Select Classifier');
+			location.reload(); 
+
 	    })
 
 		.fail(function(xhr, status, error) {
@@ -138,17 +138,16 @@ jQuery( ".mlauto_delete_classifer" ).on("click", function( event ) {
     let classifier_id = button.attr("value");
 
     var data = {
-    	"action" : "selectClassifier",
+    	"action" : "deleteClassifier",
     	"classifier_id" : classifier_id
 	};
-	
+
 
 	jQuery.post( MLAuto_Ajax_Settings.ajaxurl, data)
 		.done( function(response ) {
 
-	        console.log(response);
-
-	        button.width( button.width() ).text('Delete Classifier');
+			location.reload(); 
+			
 	    })
 
 		.fail(function(xhr, status, error) {

@@ -23,27 +23,40 @@ class MLAuto_Tag_Ajax_Hooks {
 	function selectClassifier() {
 		$data = $_POST;
 
-		$retval = array();
-
 		if (isset($data["classifier_id"])) {
 
 			update_option("MLAuto_classifier_id", $data["classifier_id"]);
 
-			$model = getClassificationModel($data["classifier_id"]);
+			$model = ClassificationModel::getClassificationModel($data["classifier_id"]);
 
 			update_option('MLAuto_taxonomies', $model->selected_taxonomies);
 			update_option('MLAuto_specified_features', $model->specified_features);
 			update_option('MLAuto_test_percentage', $model->training_percentage);
 			update_option('MLAuto_cost', $model->cost);
 			update_option('MLAuto_gamma', $model->gamma);
-			update_option('MLAuto_tolerance', $model->specified_features);
+			update_option('MLAuto_tolerance', $model->tolerance);
 			update_option('MLAuto_cache_size', $model->specified_features);
 
 		}
 
-		wp_send_json_success($message);
 		wp_die();
 	}
+
+
+	function deleteClassifier() {
+		$data = $_POST;
+
+		$retval = array();
+
+		if (isset($data["classifier_id"])) {
+
+			ClassificationModel::deleteClassificationModel($data["classifier_id"]);
+
+		}
+
+		wp_die();
+	}
+
 
 
 	function saveSettings() {
@@ -212,7 +225,8 @@ class MLAuto_Tag_Ajax_Hooks {
 		add_action( 'wp_ajax_saveSettings', array($this, 'saveSettings'));  
 		add_action( 'wp_ajax_generateClassifier', array($this, 'generateClassifier')); 
 		add_action( 'wp_ajax_classifyPost', array($this, 'classifyPost')); 
-		add_action( 'wp_ajax_selectClassifier', array($this, 'selectClassifier')); 
+		add_action( 'wp_ajax_selectClassifier', array($this, 'selectClassifier'));
+		add_action( 'wp_ajax_deleteClassifier', array($this, 'deleteClassifier')); 
 	}
 
 }

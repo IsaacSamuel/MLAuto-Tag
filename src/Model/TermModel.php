@@ -6,6 +6,8 @@ namespace mlauto\Model;
 
 use mlauto\Wrapper\Term;
 
+use mlauto\Model\ClassificationModel;
+
 
 
 class TermModel {
@@ -64,11 +66,7 @@ class TermModel {
 					FROM $table_name
 					WHERE classification_id = %d",
 					$classification_id));
-
-
 	}
-
-
 }
 
 ?>

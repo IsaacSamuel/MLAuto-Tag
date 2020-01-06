@@ -131,28 +131,49 @@ class ClassificationModel {
 		return $classifications;
 	}
 
+	public static function deleteDirectory(String $dir) {
+	    if (!file_exists($dir)) {
+	        return true;
+	    }
 
-	public function deleteClassification(int $id) {
-		global $wpdb;
+	    if (!is_dir($dir)) {
+	        return unlink($dir);
+	    }
 
-		$table_name = $wpdb->prefix . 'MLAutoTag_Classifications';
+	    foreach (scandir($dir) as $item) {
+	        if ($item == '.' || $item == '..') {
+	            continue;
+	        }
 
-		//get custom_name of matching classification
+	        if (!ClassificationModel::deleteDirectory($dir . DIRECTORY_SEPARATOR . $item)) {
+	            return false;
+	        }
 
-		//recursively delete all in that folder
+	    }
 
-		//if success
-		
-		$wpdb->delete( 
-			$table_name, 
-			array( 
-				'id' => $id
-			) 
-		);
+	    return rmdir($dir);
 	}
 
 
+	public static function deleteClassificationModel(int $classification_id) {
+		global $wpdb;
+
+		$classification = ClassificationModel::getClassificationModel($classification_id);
+
+		ClassificationModel::deleteDirectory(MLAUTO_PLUGIN_URL . $classification->classifier_directory);
 
 
+		$table_name = $wpdb->prefix . 'MLAutoTag_Classifications';
+		
+		$wpdb->update( 
+			$table_name, 
+			array( 
+				'active' => false
+			),
+			array( 
+				'id' => $classification->id
+			)
+		);
+	}
 
 }
