@@ -176,4 +176,21 @@ class ClassificationModel {
 		);
 	}
 
+	public static function getMatchingClassificationModels(string $classification_name) {
+		global $wpdb;
+
+		$table_name = $wpdb->prefix . 'MLAutoTag_Classifications';
+
+
+		$classifications = $wpdb->get_results( $wpdb->prepare(
+					"SELECT * 
+					FROM $table_name
+					WHERE custom_name = %s
+					ORDER BY created_at DESC",
+					$classification_name),
+					OBJECT);
+
+		return $classifications;
+	}
+
 }

@@ -37,6 +37,9 @@ class MLAuto_Tag_Ajax_Hooks {
 			update_option('MLAuto_tolerance', $model->tolerance);
 
 		}
+		else {
+	    	wp_send_json_error('Could not detect a classifer_id option.');
+	    }
 
 		wp_die();
 	}
@@ -52,6 +55,9 @@ class MLAuto_Tag_Ajax_Hooks {
 			ClassificationModel::deleteClassificationModel($data["classifier_id"]);
 
 		}
+		else {
+	    	wp_send_json_error('Could not detect a classifer_id option.');
+	    }
 
 		wp_die();
 	}
@@ -61,34 +67,40 @@ class MLAuto_Tag_Ajax_Hooks {
 	function saveSettings() {
 		$data = $_POST;
 
-		try {
-			if (isset($data["settings"])) {
-		    	foreach ($data["settings"] as $setting) {
-		    		if (isset($setting["name"])) {
-		    			if($setting["name"] == "MLAuto_classifier_name") {
-		    				//delete any classification with this name
+		$args = MLAuto_Tag::getConfig();
 
-		    				//If the user didn't select a custom name, make it a timestamp
-		    				if (!$setting["value"]) {
-								$setting["value"] = current_time('timestamp');
-		    				}
 
-		    			}
-		    			update_option($setting["name"], $setting["value"]);
-		    		}
-		    	}
+		if (isset($data["settings"])) {
+	    	foreach ($data["settings"] as $setting) {
+	    		if (isset($setting["name"])) {
+	    			if($setting["name"] == "MLAuto_classifier_name") {
 
-		    	$message = MLAuto_Tag::getConfig();
-		    }
-		    else {
-		    	wp_send_json_error('Could not detect a settings option.');
-		    }
+	    				//If the user didn't select a custom name, make it a timestamp
+	    				if (!$setting["value"]) {
+							$setting["value"] = current_time('timestamp');
+	    				}
+	    				else {
+	    					//delete any classification with this name
+							$matching_classification_models = ClassificationModel::getMatchingClassificationModels($setting["value"]);
+							foreach($matching_classification_models as $matching_classification_model) {
+								ClassificationModel::deleteClassificationModel($matching_classification_model->id);
+							}
+							
+	    					update_option("MLAuto_classifier_id", null);
+	    				}
+	    			}
+	    			update_option($setting["name"], $setting["value"]);
+	    		}
+	    	}
 
-		    wp_send_json_success($message);
-		}
-		catch (Exception $e) {
-			wp_send_json_error('Caught exception: '. $e->getMessage() . "\n");
-		}
+	    	$message = MLAuto_Tag::getConfig();
+	    }
+	    else {
+	    	wp_send_json_error('Could not detect a settings option.');
+	    }
+
+	    wp_send_json_success($message);
+
 
 		wp_die();
 	}
