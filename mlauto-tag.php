@@ -45,7 +45,7 @@ class MLAuto_Tag {
 		add_option('MLAuto_cache_size', 100);
 		add_option('MLAuto_label_minimum_count', 1);
 		add_option('MLAuto_save_old_classifiers', true);
-		add_option('MLAuto_classifier_id', 0);
+		add_option('MLAuto_classifier_id', null);
 
 	}
 
@@ -120,7 +120,7 @@ class MLAuto_Tag {
     }
 
 	public function addPluginAdminMenu() {
-	add_menu_page(  $this->plugin_name, 'MLAuto Tag', 'administrator', $this->plugin_name, array( $this, 'displayPluginAdminSettings' ) );
+	add_menu_page(  $this->plugin_name, 'MLAuto Tag', 'administrator', "mlauto-tag", array( $this, 'displayPluginAdminSettings' ) );
 	}
 
 

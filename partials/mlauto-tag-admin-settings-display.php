@@ -128,7 +128,7 @@ $current_classification_terms = TermModel::getTerms($current_classification->id)
     <div id="current_classifier" class="mlauto_classifier_container">
     	<h2>Current Classifier</h2>
     	<p><strong>Name:</strong> <?php echo  $current_classification->custom_name ?></p>
-    	<p><strong>Created at:</strong> <?php echo date("m/d/y g:i A", $classification_model->created_at) ?></p>
+    	<p><strong>Created at:</strong> <?php echo date("m/d/y g:i A", strtotime($current_classification->created_at)) ?></p>
 
     	<div class="mlauto_classifier_info_list">
     		<div class="mlauto_classifier_info_item">

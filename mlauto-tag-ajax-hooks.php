@@ -131,6 +131,7 @@ class MLAuto_Tag_Ajax_Hooks {
 				$term_names = array_map(array($this, 'getTermSlugs'), $terms);
 			}
 			$selected_terms[$taxonomy] = $term_names;
+
 		}
 
 
@@ -145,6 +146,7 @@ class MLAuto_Tag_Ajax_Hooks {
 		$classification = ClassificationModel::getClassificationModel($args["MLAuto_classifier_id"]);
 
 		$termModels = TermModel::getTerms($classification->id);
+
 
 		foreach($termModels as $termModel) {
 			if (!isset($retval[$termModel->taxonomy_name])) {

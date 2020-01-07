@@ -13,7 +13,6 @@ function mlauto_createTermList(terms, taxonomy_name) {
 	term_list.classList.add("mlauto_term_list");
 
 	terms.forEach(function(term){
-		console.log(term)
 		let term_item = document.createElement("div")
 		term_item.classList.add("mlauto_term_item");
 
@@ -99,7 +98,8 @@ jQuery( "#classify_post" ).on("click", function( event ) {
 				container_div.innerHTML = "";
 
 				//For each taxonomy
-				Object.entries(response.data).forEach(function(taxonomy) {
+				//(We use reverse because we want categories to come first--will have to change when things become dynamic
+				Object.entries(response.data).reverse().forEach(function(taxonomy) {
 
 					taxonomy[1].sort(mlauto_sortByProbability);
 
