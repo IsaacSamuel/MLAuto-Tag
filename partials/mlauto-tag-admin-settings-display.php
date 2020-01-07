@@ -14,6 +14,8 @@
 
 use mlauto\Model\ClassificationModel;
 
+use mlauto\Model\TermModel;
+
 
 
 $currentConfiguration = $this->getConfig();
@@ -35,6 +37,8 @@ $test_percentage = $currentConfiguration["MLAuto_test_percentage"];
 
 
 $current_classification = ClassificationModel::getClassificationModel($currentConfiguration["MLAuto_classifier_id"]);
+
+$current_classification_terms = TermModel::getTerms($current_classification->id);
 
 ?>
 
@@ -153,6 +157,24 @@ $current_classification = ClassificationModel::getClassificationModel($currentCo
     			?>
     		</div>
     	</div>
+
+    	<table id="current_classifier_term_data" class="display">
+    		<thead>
+    			<tr>
+    				<th>Taxonomy Name</th>
+    				<th>Term Name</th>
+    				<th>Accuracy</th>
+    			</tr>
+    		</thead>
+    		<?php 
+    			foreach($current_classification_terms as $term) { ?>
+    				<tr>
+						<td><?php echo $term->taxonomy_name ?></td>
+    					<td><?php echo $term->term_name ?></td>
+						<td><?php echo $term->accuracy ?></td>
+    				</tr>
+    			<?php } ?>
+    	</table>
     </div>
 
 

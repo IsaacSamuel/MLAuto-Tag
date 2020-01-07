@@ -52,9 +52,13 @@ class MLAuto_Tag {
 
     public function enqueueAdminScripts() {
 		wp_enqueue_style( 'mlauto-admin-style', plugins_url('static/css/style.css', __FILE__));
+		wp_enqueue_style( 'jquery.dataTables-style', plugins_url('static/css/jquery.dataTables.min.css', __FILE__));
+
 
    		wp_enqueue_script( 'jquery');
-    	wp_enqueue_script( 'mlauto-settings', plugins_url('static/js/settings.js', __FILE__), array ( 'jquery' ), 1.1, true);
+   		wp_enqueue_script( 'jquery.dataTables', plugins_url('static/js/jquery.dataTables.min.js', __FILE__), array ( 'jquery' ), 1.1, true);
+
+    	wp_enqueue_script( 'mlauto-settings', plugins_url('static/js/settings.js', __FILE__), array ( 'jquery', 'jquery.dataTables' ), 1.1, true);
     	wp_enqueue_script( 'mlauto-classify-post', plugins_url('static/js/classify_post.js', __FILE__), array ( 'jquery' ), 1.1, true);
 
 
@@ -67,7 +71,7 @@ class MLAuto_Tag {
 		) );
     }
 
-    public function mlauto_metabox_save_meta( $post_id ) {
+    public function metaboxSaveMeta( $post_id ) {
 
     	$data = $_POST;
 
@@ -160,7 +164,7 @@ class MLAuto_Tag {
 		add_action('admin_menu', array( $this, 'addPluginAdminMenu' )); 
 		add_action('add_meta_boxes', array($this, 'addPluginMetaBox') );
 
-		add_action('save_post', array($this, 'mlauto_metabox_save_meta'));
+		add_action('save_post', array($this, 'metaboxSaveMeta'));
 	}
 
 }

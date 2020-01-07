@@ -21,6 +21,10 @@ function mlauto_generateClassifier() {
 }
 
 
+jQuery(document).ready(function() {
+    jQuery('#current_classifier_term_data').DataTable();
+} );
+
 
 function mlauto_saveSettings(event) {
 
