@@ -21,9 +21,42 @@ function mlauto_generateClassifier() {
 }
 
 
+
 jQuery(document).ready(function() {
-    jQuery('#current_classifier_term_data').DataTable();
-} );
+    jQuery('#current_classifier_term_data').DataTable( {
+        initComplete: function () {
+            var column = this.api().column(0)
+
+            //Create a select dropdown to use as a filter
+            let select = jQuery('<select></select>')
+            	.appendTo(jQuery(column.header()).empty() )
+            	//This function will filter the table whenever the user selects a different taxonomy
+            	.on( 'change', function () {
+	            	    var val = jQuery.fn.dataTable.util.escapeRegex(
+					        jQuery(this).val()
+					    );
+
+					    column
+					        .search( val ? '^'+val+'$' : '', true, false )
+					        .draw();
+	            } );
+
+           	//Add each taxonomy name to the filter
+            column.data().unique().sort().each( function ( d, j ) {
+                select.append( '<option value="'+d+'">'+d+'</option>' )
+            });
+
+            //Filter for the initial element
+		    var val = jQuery.fn.dataTable.util.escapeRegex(
+		        jQuery(select).val()
+		    );
+
+		    column
+		        .search( val ? '^'+val+'$' : '', true, false )
+		        .draw();
+        }
+    });
+});
 
 
 function mlauto_saveSettings(event) {
