@@ -22,6 +22,7 @@ function mlauto_generateClassifier() {
 
 
 
+
 jQuery(document).ready(function() {
     jQuery('#current_classifier_term_data').DataTable( {
         initComplete: function () {
@@ -189,5 +190,43 @@ jQuery( ".mlauto_delete_classifer" ).on("click", function( event ) {
 			jQuery( "#mlauto_error" ).html(xhr.responseText);
 
 			button.width( button.width() ).text('Delete Classifier');
+	    });
+});
+
+
+
+jQuery( ".mlauto_get_term_data" ).on("click", function( event ) {
+
+	//Prevent jumping to the top
+	event.preventDefault();
+
+	button = jQuery( this );
+
+	//Click feedback
+    button.width( button.width() ).text('...');
+
+
+    let classifier_id = button.attr("value");
+
+    var data = {
+    	"action" : "getTermModelData",
+    	"classifier_id" : classifier_id
+	};
+
+	console.log(data)
+
+
+	jQuery.post( MLAuto_Ajax_Settings.ajaxurl, data)
+		.done( function(response ) {
+			button.css("display", "none");
+
+			console.log(response);
+
+	    })
+
+		.fail(function(xhr, status, error) {
+			jQuery( "#mlauto_error" ).html(xhr.responseText);
+
+			button.width( button.width() ).text('Get Classifier Data');
 	    });
 });

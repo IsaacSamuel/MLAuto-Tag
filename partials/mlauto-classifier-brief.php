@@ -39,6 +39,12 @@ foreach ($classification_models as $classification_model) {
 				</div>
 			</div>
 			<?php
+
+			echo "<a href='#' class='mlauto_button mlauto_get_term_data button button-primary' value='" . $classification_model->id . "'>Get Classifier Data</a>";
+
+
+			echo "<br>";
+
 			echo "<a href='#' class='mlauto_button mlauto_select_classifer button button-primary' value='" . $classification_model->id . "'>Select Classifier</a>";
 
 			echo "<a href='#' class='mlauto_button mlauto_delete_classifer button button-primary' value='" . $classification_model->id . "'>Delete Classifier</a>";

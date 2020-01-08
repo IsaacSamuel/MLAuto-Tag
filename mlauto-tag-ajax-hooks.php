@@ -62,6 +62,30 @@ class MLAuto_Tag_Ajax_Hooks {
 		wp_die();
 	}
 
+	function getTermModelData() {
+		$data = $_POST;
+
+		$retval = array();
+
+		$classifier_id = $data["classifier_id"];
+
+		$terms = TermModel::getTerms($classifier_id);
+
+		foreach($terms as $term) {
+			$term_info = array(
+				"taxonomy_name" => $term->taxonomy_name,
+				"name" => $term->term_name,
+				"accuracy" => $term->accuracy
+			);
+
+			array_push($retval, $term_info);
+		}
+
+
+		wp_send_json_success($retval);
+
+		wp_die();
+	}
 
 
 	function saveSettings() {
@@ -240,6 +264,7 @@ class MLAuto_Tag_Ajax_Hooks {
 		add_action( 'wp_ajax_classifyPost', array($this, 'classifyPost')); 
 		add_action( 'wp_ajax_selectClassifier', array($this, 'selectClassifier'));
 		add_action( 'wp_ajax_deleteClassifier', array($this, 'deleteClassifier')); 
+		add_action( 'wp_ajax_getTermModelData', array($this, 'getTermModelData')); 
 	}
 
 }
