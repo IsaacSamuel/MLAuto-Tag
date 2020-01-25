@@ -65,7 +65,6 @@ function mlauto_saveSettings(event) {
 
 			jQuery("#mlauto_error").html(xhr.responseText);
     		
-			button.width( button.width() ).text('Save Settings');
 	    });
 }
 

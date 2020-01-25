@@ -18,7 +18,7 @@ class ClassificationModel {
 		$charset_collate = $wpdb->get_charset_collate();
 
 		//If table does not exist
-		if(!isset(MLAUTO_TAG_DB_VERSION) || MLAUTO_TAG_NEW_DB_VERSION > MLAUTO_TAG_DB_VERSION)  {	
+		if(!is_null(get_option("MLAuto_version")) || $GLOBALS["mlauto_db_version"] > get_option("MLAuto_version")) {
 
 			$sql = "CREATE TABLE $table_name (
 							  id mediumint(9) NOT NULL AUTO_INCREMENT,

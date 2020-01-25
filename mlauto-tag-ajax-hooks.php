@@ -13,6 +13,7 @@ use mlauto\Wrapper\Term;
 
 use Phpml\Metric\Accuracy;
 use Phpml\Metric\ClassificationReport;
+use Phpml\Metric\ConfusionMatrix;
 
 use Phpml\Dataset\ArrayDataset;
 use Phpml\CrossValidation\RandomSplit;
@@ -249,6 +250,7 @@ class MLAuto_Tag_Ajax_Hooks {
 				$term->setClassifier($classifier, $classificationModel->id);
 				$term->setPath(MLAUTO_PLUGIN_URL . $classificationModel->classifier_directory);
 				$term->setAccuracy(Accuracy::score($test_labels, $predictedLabels, true));
+				$term->interpolateConfusionMatrix(ConfusionMatrix::compute($test_labels, $predictedLabels));
 
 				TermModel::saveTermModel($term);
 			}

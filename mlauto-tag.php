@@ -12,21 +12,10 @@ declare(strict_types=1);
 
 require 'class_loader.php';
 
-use mlauto\Model\PostInfoAggregator;
+
+
 use mlauto\Model\ClassificationModel;
 use mlauto\Model\TermModel;
-
-
-use mlauto\Analysis\Vectorizer;
-use mlauto\Analysis\Classifier;
-
-
-
-use Phpml\Metric\Accuracy;
-use Phpml\Metric\ClassificationReport;
-
-use Phpml\Dataset\ArrayDataset;
-use Phpml\CrossValidation\RandomSplit;
 
 
 
@@ -143,15 +132,15 @@ class MLAuto_Tag {
 
 	private function init() {
 		//If we haven't set the default classification configuration, configure it
-		$this->buildConfig();
-
-		define("MLAUTO_TAG_NEW_DB_VERSION", 1.0);
+		$GLOBALS["mlauto_db_version"] = 1.0;
 
 		//If SQL Table isn't initiated, initiate it
 		ClassificationModel::intializeTable();
 		TermModel::intializeTable();
 
-		define("MLAUTO_TAG_DB_VERSION", MLAUTO_TAG_NEW_DB_VERSION);
+		$this->buildConfig();
+
+		update_option("MLAuto_version", $GLOBALS["mlauto_db_version"]);
 	}
 
 	public function __construct() {

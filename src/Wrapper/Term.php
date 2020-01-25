@@ -18,6 +18,14 @@ class Term {
 	private $classifier;
 	private $classification_id;
 
+	public $total_samples;
+	public $negatives;
+	public $positives;
+	public $true_positives;
+	public $true_negatives;
+	public $false_positives;
+	public $false_negatives;
+
 
 	public function setPath(String $classifierPath) {
 		$this->path = $classifierPath . $this->taxonomy . "/" . $this->name;
@@ -79,6 +87,18 @@ class Term {
 		$this->predicted_probability = $this->classifier->predictProbability($vectorized_samples)[0];
 	}
 
+
+	public function interpolateConfusionMatrix($confustion_matrix) {
+		$this->true_positives = $confustion_matrix[0][0];
+		$this->false_positives = $confustion_matrix[0][1];
+		$this->false_negatives = $confustion_matrix[1][0];
+		$this->true_negatives = $confustion_matrix[1][1];
+
+		$this->negatives = $this->false_positives + $this->true_negatives;
+		$this->positives = $this->true_positives + $this->false_negatives;
+
+		$this->total_samples = $this->negatives + $this->positives;
+	}
 
 	public function __construct($name, $taxonomyName) {
 		$this->taxonomy = $taxonomyName;
