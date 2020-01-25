@@ -15,11 +15,10 @@ class ClassificationModel {
 		global $wpdb;
 		$table_name = $wpdb->prefix . 'MLAutoTag_Classifications';
 
-
 		$charset_collate = $wpdb->get_charset_collate();
 
 		//If table does not exist
-		if(!$wpdb->get_var("SHOW TABLES LIKE '$table_name'") == $table_name) {	
+		if(!isset(MLAUTO_TAG_DB_VERSION) || MLAUTO_TAG_NEW_DB_VERSION > MLAUTO_TAG_DB_VERSION)  {	
 
 			$sql = "CREATE TABLE $table_name (
 							  id mediumint(9) NOT NULL AUTO_INCREMENT,

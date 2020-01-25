@@ -145,9 +145,13 @@ class MLAuto_Tag {
 		//If we haven't set the default classification configuration, configure it
 		$this->buildConfig();
 
+		define("MLAUTO_TAG_NEW_DB_VERSION", 1.0);
+
 		//If SQL Table isn't initiated, initiate it
 		ClassificationModel::intializeTable();
 		TermModel::intializeTable();
+
+		define("MLAUTO_TAG_DB_VERSION", MLAUTO_TAG_NEW_DB_VERSION);
 	}
 
 	public function __construct() {
@@ -155,8 +159,6 @@ class MLAuto_Tag {
 		$this->init();
 
 		new MLAuto_Tag_Ajax_Hooks();
-
-		//$this->testClassifier();
 
 		//Add actions and hooks
 		add_action( 'admin_enqueue_scripts',  array( $this, 'enqueueAdminScripts'));
