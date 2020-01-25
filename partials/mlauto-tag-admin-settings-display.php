@@ -163,23 +163,7 @@ $current_classification_terms = TermModel::getTerms($current_classification->id)
     		</div>
     	</div>
 
-    	<table id="current_classifier_term_data" class="display">
-    		<thead>
-    			<tr>
-    				<th>Taxonomy Name</th>
-    				<th>Term Name</th>
-    				<th>Accuracy</th>
-    			</tr>
-    		</thead>
-    		<?php 
-    			foreach($current_classification_terms as $term) { ?>
-    				<tr>
-						<td><?php echo $term->taxonomy_name ?></td>
-    					<td><?php echo $term->term_name ?></td>
-						<td><?php echo $term->accuracy ?></td>
-    				</tr>
-    			<?php } ?>
-    	</table>
+    	<table id="current_classifier_table" class="display" classifier_id=<?php echo $current_classification->id ?> ></table>
     </div>
 
 
