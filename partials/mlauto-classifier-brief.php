@@ -10,7 +10,7 @@ foreach ($classification_models as $classification_model) {
 	if ($classification_model->id != $currentConfiguration["MLAuto_classifier_id"]) { ?>
 		<div class="mlauto_past_classifier" id=<?php echo 'mlauto_classifier_model_' . $classification_model->id ?> >
 			<h3><?php echo  $classification_model->custom_name ?></h3>
-			<p><strong>Created at:</strong> <?php echo date("m/d/y g:i A", $classification_model->created_at) ?></p>
+			<p><strong>Created at:</strong> <?php echo date("m/d/y g:i A", strtotime($classification_model->created_at)) ?></p>
 
 			<div class="mlauto_classifier_info_list">
 				<div class="mlauto_classifier_info_item">
