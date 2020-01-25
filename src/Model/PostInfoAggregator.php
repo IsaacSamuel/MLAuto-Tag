@@ -50,7 +50,10 @@ class PostInfoAggregator {
 		return $term_names;
 	}
 
-	private function clean_post_feature(String $feature) {
+	private function clean_frequency_feature(String $feature) {
+		//E.g. "<p>You're tearing me <i>apart</i>, Lisa!</p>" -->
+		// "youre tearing me apart lisa"
+
 		//Convert to lowercase
 		$cleaned_feature = strtolower($feature);
 		//Strip HTML tags
@@ -61,14 +64,53 @@ class PostInfoAggregator {
 		return $cleaned_feature;
 	}
 
+	private function clean_categorical_feature(String $feature) {
+		//strip all punctuation and whitespace, replace with underscores
+		//E.g. "Walt Whitman" => "Walt_Whitman"
+		//E.g. "My Brother's Posts" => "My_Brother_s_Posts"
+
+		$cleaned_feature = preg_replace('/[^A-z0-9]+/', '_', $feature); 
+
+		return $cleaned_feature;
+	}
+
+
 
 	private function extract_post_features(Object &$post, array $feature_names) {
 		$post_features = array();
 
-		foreach($feature_names as $feature) {
-			$cleaned_feature = $this->clean_post_feature($post->$feature);
+		/*
+		Different features must be cleaned differently, because their value in categorizing is different conceptually.
 
-			array_push($post_features, $this->clean_post_feature($post->$feature));
+		For the features post_content, post_excerpt, and post_title, the we want to find important keywords and their frequency.*/
+
+		$frequncy_features = array("post_content", "post_title", "post_excerpt");
+		
+		//For the features post_author and post_type, we wouldn't expect word frequency to matter. "Walt Disney" and "Walt Whitman" aren't producing related works on the basis of their first names. We essentially want to hash the names. Similarly a post type named "Authors" and "Types of Authors" shouldn't have similar tags on the basis of having the word "Authors" in their names.
+
+		$categorical_features = array("post_author", "post_type");
+		
+		foreach($feature_names as $feature_type) {
+			//Clean frequency features
+			if (in_array($feature_type, $frequncy_features)) {
+				$cleaned_feature = $this->clean_frequency_feature($post->$feature_type);
+			}
+
+			//Clean categorical features
+			if (in_array($feature_type, $categorical_features)) {
+
+				//post_author is actually a numerical string representing the author's id. That's absolutely fine for statistical purposes, but we'll get the author's display name to make it easier for humans to reason about while doing diagnostics.
+				if($feature_type == "post_author") {
+					$feature = get_author_name($post->$feature_type);
+				}
+				else {
+					$feature = $post->$feature_type;
+				}
+
+				$cleaned_feature = $this->clean_categorical_feature($feature);
+			}
+
+			array_push($post_features, $cleaned_feature);
 		}
 
 		array_push($this->features, $post_features);

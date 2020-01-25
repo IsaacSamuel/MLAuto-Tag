@@ -86,7 +86,6 @@ class ClassificationModel {
 					ORDER BY created_at DESC
 					LIMIT 1", OBJECT
 		);
-
 	}
 
 

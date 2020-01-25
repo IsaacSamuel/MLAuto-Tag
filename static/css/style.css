@@ -37,8 +37,9 @@
 	flex-wrap: wrap;
 }
 
-.mlauto_checkbox > label {
+.mlauto_checkbox_option {
 	margin-right: 10px;
+	margin-bottom: 10px;
 }
 
 .mlauto_button {

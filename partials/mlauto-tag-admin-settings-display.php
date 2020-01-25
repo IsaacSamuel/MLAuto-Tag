@@ -28,7 +28,7 @@ array_unshift($taxonomy_names, "category");
 array_unshift($taxonomy_names, "post_tag");
 
 //For now, we're hardcoding the potential features. Not many are supported.
-$features = array("post_title", "post_content");
+$features = array("post_title", "post_content", "post_author", "post_excerpt");
 
 $gamma = ($currentConfiguration["MLAuto_gamma"] == null ? 0 : $currentConfiguration["MLAuto_gamma"] );
 $cost = $currentConfiguration["MLAuto_cost"];
@@ -66,8 +66,10 @@ $current_classification_terms = TermModel::getTerms($current_classification->id)
 	        	<p>Select the taxonomies you'd like to run the classifier upon. <strong>Note:</strong> The classifier runs a lot better on taxonomies with a lot of examples. Taxonomies with very few matching posts will not be predicted well.</p>
 	        	<div class="mlauto_checkbox">
 	        		<?php foreach ($taxonomy_names as $name) { ?>
-	        			<input type=checkbox name="taxonomies" value=<?php echo '"' . $name . '" ' . (in_array($name, $currentConfiguration["MLAuto_taxonomies"]) ? "checked" : "" ) ?> id = <?php echo $name ?> > 
-	        			<label for=<?php echo '"' . $name . '"' ?>><?php echo $name ?> </label>
+	        			<div class="mlauto_checkbox_option">
+		        			<input type=checkbox name="taxonomies" value=<?php echo '"' . $name . '" ' . (in_array($name, $currentConfiguration["MLAuto_taxonomies"]) ? "checked" : "" ) ?> id = <?php echo $name ?> > 
+		        			<label for=<?php echo '"' . $name . '"' ?>><?php echo $name ?> </label>
+	        			</div>
 	        		<?php } ?>
 	    		</div>
 	    	</div>
@@ -75,11 +77,14 @@ $current_classification_terms = TermModel::getTerms($current_classification->id)
 	    	<div class="mlauto_settings_form_item">
 	    		<h3>Features</h3>
 	        	<p>Features are the data that the classifier will use to predict which classification(s) your post belongs in. The more numberous and less random the features, the more accurate the classifier will get in general, but the longer it will take to run.</p>
+	        	<p><b>Hint:</b> The feature post_excerpt will overlap with post_content, unless you are writing custom excerpts for each post. Using both generally won't boost the accuracy of the algorithm. However, using post_excerpt in lieu of post_content might be a good option if A) the algorithm is taking too long to train and B) custom post_excerpts are not defined. 
 	    		
 	    		<div class="mlauto_checkbox">
 	        		<?php foreach ($features as $feature) { ?>
-	        			<input type=checkbox name="features" value=<?php echo '"' . $feature . '" ' . (in_array($feature, $currentConfiguration["MLAuto_specified_features"]) ? "checked" : "" ) ?> id = <?php echo $feature ?> > 
-	        			<label for=<?php echo '"' . $feature . '"' ?>><?php echo $feature ?> </label>
+	        			<div class="mlauto_checkbox_option">
+		        			<input type=checkbox name="features" value=<?php echo '"' . $feature . '" ' . (in_array($feature, $currentConfiguration["MLAuto_specified_features"]) ? "checked" : "" ) ?> id = <?php echo $feature ?> > 
+		        			<label for=<?php echo '"' . $feature . '"' ?>><?php echo $feature ?> </label>
+	        			</div>
 	        		<?php } ?>
 	    		</div>
 	    	</div>
