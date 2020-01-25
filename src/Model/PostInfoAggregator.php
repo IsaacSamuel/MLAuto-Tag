@@ -50,12 +50,25 @@ class PostInfoAggregator {
 		return $term_names;
 	}
 
+	private function clean_post_feature(String $feature) {
+		//Convert to lowercase
+		$cleaned_feature = strtolower($feature);
+		//Strip HTML tags
+		$cleaned_feature = strip_tags($cleaned_feature);
+		//Strip punctuation and numbers
+		$cleaned_feature = preg_replace("/[^a-z]+/i", " ", $cleaned_feature);
+
+		return $cleaned_feature;
+	}
+
 
 	private function extract_post_features(Object &$post, array $feature_names) {
 		$post_features = array();
 
-		foreach($feature_names as $feature_name) {
-			array_push($post_features, strtolower($post->$feature_name));
+		foreach($feature_names as $feature) {
+			$cleaned_feature = $this->clean_post_feature($post->$feature);
+
+			array_push($post_features, $this->clean_post_feature($post->$feature));
 		}
 
 		array_push($this->features, $post_features);
