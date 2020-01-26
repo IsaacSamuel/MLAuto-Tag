@@ -72,16 +72,50 @@ class MLAuto_Tag_Ajax_Hooks {
 
 		$terms = TermModel::getTerms($classifier_id);
 
+
+
 		foreach($terms as $term) {
+
+			$TP = $term->true_positives;
+			$TN =  $term->true_negatives;
+			$FP =  $term->false_positives;
+			$FN =  $term->false_negatives;
+
+			$TPR = floatval($TP) / ($TP + $FN);
+			$FNR = floatval($FN) / ($TP + $FN);
+			$FPR = floatval($FP) / ($FP + $TN);
+			$TNR = floatval($TN) / ($FP + $TN);
+
+			$PPV = floatval($TP) / ($TP + $FP);
+			$NPV = floatval($TN) / ($TN + $FN);
+
+			$MCC = ((floatval($TP) * $TN) - ($FP * $FN)) / sqrt(($TP + $FP)*($TP + $FN)*($TN + $FP)*($TN + $FN));
+
+
 			$term_info = array(
 				"taxonomy_name" => $term->taxonomy_name,
-				"name" => $term->term_name,
-				"accuracy" => $term->accuracy
+				"term_name" => $term->term_name,
+				"accuracy" => $term->accuracy,
+				'total' => $term->total,
+				'positives' => $term->positives,
+				'negatives' => $term->negatives,
+				'true_positives' => $TP,
+				'true_negatives' =>  $TN,
+				'false_positives' =>  $FP,
+				'false_negatives' =>  $FN,
+				'true_positive_rate' => is_nan($TPR) ? "irrelevant" : $TPR,
+				'false_negative_rate' => is_nan($FNR) ? "irrelevant" : $FNR,
+				'false_positive_rate' => is_nan($FPR) ? "irrelevant" : $FPR,
+				'true_negative_rate' => is_nan($TNR) ? "irrelevant" : $TNR,
+				'positive_predicitive_value' => is_nan($PPV) ? "irrelevant" : $PPV,
+				'negative_predictive_value' => is_nan($NPV) ? "irrelevant" : $NPV,
+				'mcc' => is_nan($MCC) ? "irrelevant" : $MCC
 			);
+
+			//var_dump(is_nan($MCC));
 
 			array_push($retval, $term_info);
 		}
-
 
 		wp_send_json_success($retval);
 
@@ -250,7 +284,8 @@ class MLAuto_Tag_Ajax_Hooks {
 				$term->setClassifier($classifier, $classificationModel->id);
 				$term->setPath(MLAUTO_PLUGIN_URL . $classificationModel->classifier_directory);
 				$term->setAccuracy(Accuracy::score($test_labels, $predictedLabels, true));
-				$term->interpolateConfusionMatrix(ConfusionMatrix::compute($test_labels, $predictedLabels));
+				$term->interpolateConfusionMatrix(ConfusionMatrix::compute($test_labels, $predictedLabels, [1, 0]));
+
 
 				TermModel::saveTermModel($term);
 			}

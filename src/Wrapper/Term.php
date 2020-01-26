@@ -89,10 +89,10 @@ class Term {
 
 
 	public function interpolateConfusionMatrix($confustion_matrix) {
-		$this->true_positives = $confustion_matrix[0][0];
-		$this->false_positives = $confustion_matrix[0][1];
-		$this->false_negatives = $confustion_matrix[1][0];
-		$this->true_negatives = $confustion_matrix[1][1];
+		$this->true_positives = is_null($confustion_matrix[0][0]) ? 0 : $confustion_matrix[0][0];
+		$this->false_positives = is_null($confustion_matrix[0][1]) ? 0 : $confustion_matrix[0][1];
+		$this->false_negatives = is_null($confustion_matrix[1][0]) ? 0 : $confustion_matrix[1][0];
+		$this->true_negatives = is_null($confustion_matrix[1][1]) ? 0 : $confustion_matrix[1][1];
 
 		$this->negatives = $this->false_positives + $this->true_negatives;
 		$this->positives = $this->true_positives + $this->false_negatives;

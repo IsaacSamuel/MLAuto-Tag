@@ -44,7 +44,7 @@ class Classifier {
 
 		//var_dump($sample_labels);
 
-		$classifier = new SVC(Kernel::RBF, $args["MLAuto_cost"], 3, $args["MLAuto_gamma"], 0.0, $args["MLAuto_tolerance"], 100, false, true);
+		$classifier = new SVC(Kernel::POLYNOMIAL, $args["MLAuto_cost"], 3, $args["MLAuto_gamma"], 0.0, $args["MLAuto_tolerance"], 10, true, true);
 		$classifier->train($sample_features, $sample_labels);
 
 		$this->trained_classifier = $classifier;
