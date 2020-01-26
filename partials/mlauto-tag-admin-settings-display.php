@@ -20,7 +20,6 @@ use mlauto\Model\TermModel;
 
 $currentConfiguration = $this->getConfig();
 
-
 //Get taxonomy terms
 $taxonomies = get_taxonomies(array("_built_in" => false), "names");
 $taxonomy_names = array_keys($taxonomies);
@@ -35,10 +34,11 @@ $cost = $currentConfiguration["MLAuto_cost"];
 $tolerance = $currentConfiguration["MLAuto_tolerance"];
 $test_percentage = $currentConfiguration["MLAuto_test_percentage"];
 
+if ($currentConfiguration["MLAuto_classifier_id"]) {
+	$current_classification = ClassificationModel::getClassificationModel($currentConfiguration["MLAuto_classifier_id"]);
 
-$current_classification = ClassificationModel::getClassificationModel($currentConfiguration["MLAuto_classifier_id"]);
-
-$current_classification_terms = TermModel::getTerms($current_classification->id);
+	$current_classification_terms = TermModel::getTerms($current_classification->id);
+}
 
 ?>
 
@@ -130,45 +130,47 @@ $current_classification_terms = TermModel::getTerms($current_classification->id)
         ?>  
 	</div>
 
-    <div id="current_classifier" class="mlauto_classifier_container">
-    	<h2>Current Classifier</h2>
-    	<p><strong>Name:</strong> <?php echo  $current_classification->custom_name ?></p>
-    	<p><strong>Created at:</strong> <?php echo date("m/d/y g:i A", strtotime($current_classification->created_at)) ?></p>
+	<?php if($current_classification) { ?>
+	    <div id="current_classifier" class="mlauto_classifier_container">
+	    	<h2>Current Classifier</h2>
+	    	<p><strong>Name:</strong> <?php echo  $current_classification->custom_name ?></p>
+	    	<p><strong>Created at:</strong> <?php echo date("m/d/y g:i A", strtotime($current_classification->created_at)) ?></p>
 
-    	<div class="mlauto_classifier_info_list">
-    		<div class="mlauto_classifier_info_item">
-    			<p><strong>Selected Taxonomies:</strong></p>
-    			<?php 
-    			foreach(maybe_unserialize($current_classification->selected_taxonomies) as $taxonomy) {
-    				echo ("<span>" . $taxonomy . "</span>");
-    			} ?>
-    		</div>
+	    	<div class="mlauto_classifier_info_list">
+	    		<div class="mlauto_classifier_info_item">
+	    			<p><strong>Selected Taxonomies:</strong></p>
+	    			<?php 
+	    			foreach(maybe_unserialize($current_classification->selected_taxonomies) as $taxonomy) {
+	    				echo ("<span>" . $taxonomy . "</span>");
+	    			} ?>
+	    		</div>
 
-    		<div class="mlauto_classifier_info_item">
-    			<p><strong>Selected Features:</strong></p>
-    			<?php 
-    			foreach(maybe_unserialize($current_classification->specified_features) as $feature) {
-    				echo ("<span>" . $feature . "</span>");
-    			} ?>
-    		</div>
+	    		<div class="mlauto_classifier_info_item">
+	    			<p><strong>Selected Features:</strong></p>
+	    			<?php 
+	    			foreach(maybe_unserialize($current_classification->specified_features) as $feature) {
+	    				echo ("<span>" . $feature . "</span>");
+	    			} ?>
+	    		</div>
 
-    		<div class="mlauto_classifier_info_item">
-    			<p><strong>Advanced settings:</strong></p>
-    			<?php 
-    				echo "<span><strong>Gamma: </strong>" . $current_classification->gamma . "</span>";
-					echo "<span><strong>Tolerance: </strong>" . $current_classification->tolerance . "</span>";
-					echo "<span><strong>Training Percentage: </strong>" . $current_classification->training_percentage . "</span>";
-					echo "<span><strong>Cost: </strong>" . $current_classification->cost . "</span>";
-    			?>
-    		</div>
-    	</div>
+	    		<div class="mlauto_classifier_info_item">
+	    			<p><strong>Advanced settings:</strong></p>
+	    			<?php 
+	    				echo "<span><strong>Gamma: </strong>" . $current_classification->gamma . "</span>";
+						echo "<span><strong>Tolerance: </strong>" . $current_classification->tolerance . "</span>";
+						echo "<span><strong>Training Percentage: </strong>" . $current_classification->training_percentage . "</span>";
+						echo "<span><strong>Cost: </strong>" . $current_classification->cost . "</span>";
+	    			?>
+	    		</div>
+	    	</div>
 
-    	<table id="current_classifier_table" class="display" classifier_id=<?php echo $current_classification->id ?> ></table>
-    </div>
+	    	<table id="current_classifier_table" class="display" classifier_id=<?php echo $current_classification->id ?> ></table>
+	    </div>
 
 
-    <h2>Past Classifiers</h2>
-    <div id="mlauto_past_classifiers">
-    	<?php include("mlauto-classifier-brief.php"); ?>
-    </div>
+	    <h2>Past Classifiers</h2>
+	    <div id="mlauto_past_classifiers">
+	    	<?php include("mlauto-classifier-brief.php"); ?>
+	    </div>
+	<?php } ?>
 </div>
